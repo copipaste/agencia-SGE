@@ -1,0 +1,180 @@
+<div class="container">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <p>⏳ Cargando paquete turístico...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error">
+    <p>❌ {{ error }}</p>
+    <button class="btn-back" (click)="goBack()">🔙 Volver</button>
+  </div>
+
+  <!-- Detalles del paquete -->
+  <div *ngIf="!loading && !error && paquete" class="paquete-details">
+    
+    <!-- Header -->
+    <div class="header-card">
+      <div class="header-content">
+        <h1>{{ paquete.nombrePaquete }}</h1>
+        <span class="badge-destino">📍 {{ paquete.destinoPrincipal }}</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-back" (click)="goBack()">
+          🔙 Volver
+        </button>
+        <button class="btn-edit" (click)="editPaquete()">
+          ✏️ Editar
+        </button>
+        <button class="btn-delete" (click)="deletePaquete()">
+          🗑️ Eliminar
+        </button>
+      </div>
+    </div>
+
+    <!-- Información principal -->
+    <div class="info-section">
+      <h2>📋 Información General</h2>
+      
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-icon">⏰</div>
+          <div class="info-content">
+            <span class="info-label">Duración</span>
+            <span class="info-value">{{ paquete.duracionDias || 0 }} días</span>
+          </div>
+        </div>
+
+        <div class="info-card highlight-price">
+          <div class="info-icon">💰</div>
+          <div class="info-content">
+            <span class="info-label">Precio Total</span>
+            <span class="info-value price">
+              {{ paquete.precioTotalVenta ? '$' + paquete.precioTotalVenta.toFixed(2) : 'No definido' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">📊</div>
+          <div class="info-content">
+            <span class="info-label">Precio por Día</span>
+            <span class="info-value">
+              {{ getPrecioPorDia() > 0 ? '$' + getPrecioPorDia().toFixed(2) : '-' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-icon">🎯</div>
+          <div class="info-content">
+            <span class="info-label">Servicios</span>
+            <span class="info-value">{{ paquete.servicios?.length || 0 }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="paquete.descripcion" class="description-box">
+        <h3>📝 Descripción</h3>
+        <p>{{ paquete.descripcion }}</p>
+      </div>
+    </div>
+
+    <!-- Análisis financiero -->
+    <div class="info-section" *ngIf="paquete.servicios && paquete.servicios.length > 0">
+      <h2>💹 Análisis Financiero</h2>
+      
+      <div class="financial-grid">
+        <div class="financial-card">
+          <div class="financial-label">Costo Total (Servicios)</div>
+          <div class="financial-value cost">
+            ${{ getCostoTotalServicios().toFixed(2) }}
+          </div>
+        </div>
+
+        <div class="financial-card">
+          <div class="financial-label">Venta Total (Servicios)</div>
+          <div class="financial-value revenue">
+            ${{ getPrecioVentaServicios().toFixed(2) }}
+          </div>
+        </div>
+
+        <div class="financial-card highlight">
+          <div class="financial-label">Margen de Ganancia</div>
+          <div class="financial-value margin" [class.positive]="getMargenTotal() > 0" [class.negative]="getMargenTotal() < 0">
+            {{ getMargenTotal().toFixed(2) }}%
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Servicios incluidos -->
+    <div class="info-section" *ngIf="paquete.servicios && paquete.servicios.length > 0">
+      <h2>🎯 Servicios Incluidos</h2>
+      
+      <div class="servicios-list">
+        <div *ngFor="let servicio of paquete.servicios" class="servicio-card">
+          <div class="servicio-header">
+            <div class="servicio-title">
+              <span class="servicio-icon">{{ getIconoTipoServicio(servicio.tipoServicio) }}</span>
+              <h3>{{ servicio.nombreServicio }}</h3>
+            </div>
+            <span class="badge-tipo">{{ servicio.tipoServicio }}</span>
+          </div>
+
+          <div class="servicio-body">
+            <p *ngIf="servicio.descripcion" class="servicio-descripcion">
+              {{ servicio.descripcion }}
+            </p>
+
+            <div class="servicio-details">
+              <div class="detail-item" *ngIf="servicio.destinoCiudad">
+                <span class="detail-label">📍 Destino:</span>
+                <span class="detail-value">
+                  {{ servicio.destinoCiudad }}{{ servicio.destinoPais ? ', ' + servicio.destinoPais : '' }}
+                </span>
+              </div>
+
+              <div class="detail-item" *ngIf="servicio.proveedor">
+                <span class="detail-label">🏢 Proveedor:</span>
+                <span class="detail-value">{{ servicio.proveedor.nombreEmpresa }}</span>
+              </div>
+
+              <div class="detail-item">
+                <span class="detail-label">� Estado:</span>
+                <span class="detail-value" [ngClass]="servicio.isAvailable ? 'status-available' : 'status-unavailable'">
+                  {{ servicio.isAvailable ? '✅ Disponible' : '❌ No Disponible' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="servicio-pricing">
+              <div class="pricing-item" *ngIf="servicio.precioCosto">
+                <span class="pricing-label">Costo:</span>
+                <span class="pricing-value cost">${{ servicio.precioCosto.toFixed(2) }}</span>
+              </div>
+              <div class="pricing-item" *ngIf="servicio.precioVenta">
+                <span class="pricing-label">Venta:</span>
+                <span class="pricing-value revenue">${{ servicio.precioVenta.toFixed(2) }}</span>
+              </div>
+              <div class="pricing-item" *ngIf="servicio.precioCosto && servicio.precioVenta">
+                <span class="pricing-label">Margen:</span>
+                <span class="pricing-value margin">
+                  {{ ((servicio.precioVenta - servicio.precioCosto) / servicio.precioCosto * 100).toFixed(2) }}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sin servicios -->
+    <div class="info-section" *ngIf="!paquete.servicios || paquete.servicios.length === 0">
+      <div class="empty-state">
+        <p>📭 Este paquete no tiene servicios asociados</p>
+      </div>
+    </div>
+
+  </div>
+</div>

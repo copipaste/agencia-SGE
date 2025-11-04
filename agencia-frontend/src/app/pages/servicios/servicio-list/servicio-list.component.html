@@ -1,0 +1,158 @@
+<div class="servicios-container">
+  <div class="header">
+    <h1>Gestión de Servicios</h1>
+    <div class="header-actions">
+      <app-export-buttons
+        [data]="filteredServicios"
+        [columns]="exportColumns"
+        filename="servicios"
+        printTitle="Listado de Servicios"
+      ></app-export-buttons>
+      <button class="btn-primary" routerLink="/dashboard/servicios/nuevo">
+        <span class="icon">➕</span>
+        Nuevo Servicio
+      </button>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (keyup.enter)="onSearch()"
+      (ngModelChange)="onSearch()"
+      placeholder="Buscar por nombre, descripción o destino..."
+      class="search-input"
+    />
+    <button class="btn-search" (click)="onSearch()">🔍 Buscar</button>
+    <button class="btn-clear" (click)="clearSearch()" *ngIf="searchTerm || activeFilters && Object.keys(activeFilters).length > 0">
+      ✖ Limpiar Todo
+    </button>
+  </div>
+
+  <!-- Panel de Filtros Avanzados -->
+  <app-filter-panel
+    [filters]="filterOptions"
+    (filterChange)="onFilterChange($event)"
+    (clearFilters)="onClearFilters()"
+  ></app-filter-panel>
+
+  <div class="error-message" *ngIf="errorMessage">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <p>Cargando servicios...</p>
+  </div>
+
+  <div class="servicios-grid" *ngIf="!loading">
+    <div class="servicio-card" *ngFor="let servicio of paginatedServicios">
+      <div class="card-header">
+        <div class="header-top">
+          <span class="tipo-icon">{{ getIconByTipo(servicio.tipoServicio) }}</span>
+          <span class="badge-tipo">{{ servicio.tipoServicio }}</span>
+        </div>
+        <h3>{{ servicio.nombreServicio }}</h3>
+      </div>
+
+      <div class="card-body">
+        <div class="info-row" *ngIf="servicio.descripcion">
+          <span class="label">📝 Descripción:</span>
+          <span class="value">{{ servicio.descripcion }}</span>
+        </div>
+        
+        <div class="info-row" *ngIf="servicio.proveedor">
+          <span class="label">🏢 Proveedor:</span>
+          <span class="value">{{ servicio.proveedor.nombreEmpresa }}</span>
+        </div>
+
+        <div class="info-row" *ngIf="servicio.destinoCiudad">
+          <span class="label">📍 Destino:</span>
+          <span class="value">{{ servicio.destinoCiudad }}, {{ servicio.destinoPais }}</span>
+        </div>
+
+        <div class="pricing-section">
+          <div class="price-item">
+            <span class="price-label">Precio:</span>
+            <span class="price-value">${{ servicio.precioVenta }}</span>
+          </div>
+          <div class="price-item">
+            <span class="price-label">Estado:</span>
+            <span class="price-value" [ngClass]="servicio.isAvailable ? 'status-available' : 'status-unavailable'">
+              {{ servicio.isAvailable ? 'Disponible' : 'No Disponible' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn-view" (click)="viewServicio(servicio.id)" title="Ver detalles">
+          👁️
+        </button>
+        <button class="btn-edit" (click)="editServicio(servicio.id)" title="Editar">
+          ✏️
+        </button>
+        <button 
+          class="btn-delete" 
+          (click)="deleteServicio(servicio.id, servicio.nombreServicio)" 
+          title="Eliminar"
+        >
+          🗑️
+        </button>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="filteredServicios.length === 0 && !loading">
+      <p>No se encontraron servicios</p>
+      <button class="btn-primary" routerLink="/dashboard/servicios/nuevo">
+        Agregar primer servicio
+      </button>
+    </div>
+  </div>
+
+  <!-- Paginación -->
+  <div class="pagination-container" *ngIf="!loading && filteredServicios.length > 0">
+    <div class="pagination-info">
+      Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} 
+      a {{ Math.min(currentPage * itemsPerPage, filteredServicios.length) }} 
+      de {{ filteredServicios.length }} servicios
+    </div>
+    
+    <div class="pagination-controls">
+      <button 
+        class="pagination-btn" 
+        (click)="previousPage()" 
+        [disabled]="currentPage === 1"
+        title="Página anterior"
+      >
+        ⬅️ Anterior
+      </button>
+      
+      <button 
+        *ngFor="let page of getPageNumbers()" 
+        class="pagination-btn page-number"
+        [class.active]="page === currentPage"
+        (click)="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+      
+      <button 
+        class="pagination-btn" 
+        (click)="nextPage()" 
+        [disabled]="currentPage === totalPages"
+        title="Página siguiente"
+      >
+        Siguiente ➡️
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<app-confirm-dialog
+  [show]="showConfirmDialog"
+  [data]="confirmDialogData"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+></app-confirm-dialog>

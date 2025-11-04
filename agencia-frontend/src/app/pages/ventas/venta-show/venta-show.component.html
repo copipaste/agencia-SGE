@@ -1,0 +1,136 @@
+<div class="container mt-4">
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="loading-text">Cargando detalles de la venta...</p>
+  </div>
+
+  <div *ngIf="!loading && venta" class="venta-detail">
+    <div class="detail-header">
+      <div class="header-info">
+        <i class="bi bi-receipt-cutoff"></i>
+        <div>
+          <h2>Detalle de Venta</h2>
+          <p class="venta-id">#{{ venta.id }}</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-warning" (click)="editVenta()">
+          <i class="bi bi-pencil"></i> Editar
+        </button>
+        <button class="btn btn-secondary" (click)="goBack()">
+          <i class="bi bi-arrow-left"></i> Volver
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-content">
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-header">
+            <i class="bi bi-info-circle"></i>
+            <h5>Información General</h5>
+          </div>
+          <div class="info-card-body">
+            <div class="info-row">
+              <span class="info-label">
+                <i class="bi bi-calendar3"></i> Fecha:
+              </span>
+              <span class="info-value">{{ venta.fechaVenta | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">
+                <i class="bi bi-flag"></i> Estado:
+              </span>
+              <span class="badge" [ngClass]="getEstadoBadgeClass()">
+                {{ venta.estadoVenta }}
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">
+                <i class="bi bi-credit-card"></i> Método de Pago:
+              </span>
+              <span class="info-value">{{ venta.metodoPago }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <i class="bi bi-people"></i>
+            <h5>Participantes</h5>
+          </div>
+          <div class="info-card-body">
+            <div class="info-row">
+              <span class="info-label">
+                <i class="bi bi-person-fill"></i> Cliente:
+              </span>
+              <span class="info-value">{{ getClienteNombre() }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">
+                <i class="bi bi-person-badge"></i> Agente:
+              </span>
+              <span class="info-value">{{ getAgenteNombre() }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detalles-section">
+        <div class="section-header">
+          <i class="bi bi-list-check"></i>
+          <h5>Detalles de la Venta</h5>
+        </div>
+        
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th class="th-tipo">TIPO</th>
+                <th class="th-descripcion">DESCRIPCIÓN</th>
+                <th class="th-cantidad">CANTIDAD</th>
+                <th class="th-precio">PRECIO UNITARIO</th>
+                <th class="th-subtotal">SUBTOTAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let detalle of venta.detalles" class="detalle-row">
+                <td class="td-tipo">
+                  <span class="badge badge-tipo" *ngIf="detalle.servicioId">
+                    <i class="bi bi-gear"></i> SERVICIO
+                  </span>
+                  <span class="badge badge-tipo badge-paquete" *ngIf="detalle.paqueteId">
+                    <i class="bi bi-box-seam"></i> PAQUETE
+                  </span>
+                </td>
+                <td class="td-descripcion">
+                  <span *ngIf="detalle.servicio">{{ detalle.servicio.nombreServicio }}</span>
+                  <span *ngIf="detalle.paquete">{{ detalle.paquete.nombrePaquete }}</span>
+                </td>
+                <td class="td-cantidad">{{ detalle.cantidad }}</td>
+                <td class="td-precio">{{ detalle.precioUnitarioVenta | currency }}</td>
+                <td class="td-subtotal">{{ detalle.subtotal | currency }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="total-container">
+          <div class="total-label">MONTO TOTAL:</div>
+          <div class="total-amount">{{ venta.montoTotal | currency }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !venta" class="empty-state">
+    <i class="bi bi-exclamation-triangle"></i>
+    <h4>No se encontró la venta</h4>
+    <p>La venta solicitada no existe o ha sido eliminada</p>
+    <button class="btn btn-primary" (click)="goBack()">
+      <i class="bi bi-arrow-left"></i> Volver al Listado
+    </button>
+  </div>
+</div>

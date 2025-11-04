@@ -1,0 +1,145 @@
+<div class="container">
+  <div class="header">
+    <h1>Gestión de Paquetes Turísticos</h1>
+    <button class="btn-primary" routerLink="/dashboard/paquetes-turisticos/nuevo">
+      <span class="icon">➕</span>
+      Nuevo Paquete
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="search-bar">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (keyup.enter)="searchPaquetes()"
+      placeholder="Buscar por nombre o descripción..."
+      class="search-input"
+    />
+    <button class="btn-search" (click)="searchPaquetes()">🔍 Buscar</button>
+    <button class="btn-clear" (click)="clearSearch()" *ngIf="searchTerm">✖ Limpiar</button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <p>⏳ Cargando paquetes turísticos...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error">
+    <p>❌ {{ error }}</p>
+  </div>
+
+  <!-- Lista de paquetes -->
+  <div *ngIf="!loading && !error" class="paquetes-grid">
+    <div *ngFor="let paquete of paginatedPaquetes" class="paquete-card">
+      <div class="card-header">
+        <h3>{{ paquete.nombrePaquete }}</h3>
+        <span class="badge-destino">📍 {{ paquete.destinoPrincipal }}</span>
+      </div>
+
+      <div class="card-body">
+        <p class="descripcion">{{ paquete.descripcion || 'Sin descripción' }}</p>
+        
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">⏰ Duración:</span>
+            <span class="value">{{ paquete.duracionDias || 0 }} días</span>
+          </div>
+          
+          <div class="info-item">
+            <span class="label">💰 Precio Total:</span>
+            <span class="value price">
+              {{ paquete.precioTotalVenta ? '$' + paquete.precioTotalVenta.toFixed(2) : 'No definido' }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">📊 Precio/Día:</span>
+            <span class="value">
+              {{ getPrecioPorDia(paquete) > 0 ? '$' + getPrecioPorDia(paquete).toFixed(2) : '-' }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">🎯 Servicios:</span>
+            <span class="value badge-servicios">{{ getNumServicios(paquete) }}</span>
+          </div>
+        </div>
+
+        <!-- Lista de servicios incluidos -->
+        <div *ngIf="getNumServicios(paquete) > 0" class="servicios-list">
+          <p class="servicios-title">Servicios incluidos:</p>
+          <ul>
+            <li *ngFor="let servicio of paquete.servicios">
+              {{ servicio.nombreServicio }} ({{ servicio.tipoServicio }})
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn-view" (click)="viewPaquete(paquete.id)">
+          👁️ Ver
+        </button>
+        <button class="btn-edit" (click)="editPaquete(paquete.id)">
+          ✏️ Editar
+        </button>
+        <button class="btn-delete" (click)="deletePaquete(paquete.id, paquete.nombrePaquete)">
+          🗑️ Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sin resultados -->
+  <div *ngIf="!loading && !error && filteredPaquetes.length === 0" class="empty-state">
+    <p>📭 No se encontraron paquetes turísticos</p>
+  </div>
+
+  <!-- Paginación -->
+  <div class="pagination-container" *ngIf="!loading && !error && filteredPaquetes.length > 0">
+    <div class="pagination-info">
+      Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} 
+      a {{ Math.min(currentPage * itemsPerPage, filteredPaquetes.length) }} 
+      de {{ filteredPaquetes.length }} paquetes turísticos
+    </div>
+    
+    <div class="pagination-controls">
+      <button 
+        class="pagination-btn" 
+        (click)="previousPage()" 
+        [disabled]="currentPage === 1"
+        title="Página anterior"
+      >
+        ⬅️ Anterior
+      </button>
+      
+      <button 
+        *ngFor="let page of getPageNumbers()" 
+        class="pagination-btn page-number"
+        [class.active]="page === currentPage"
+        (click)="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+      
+      <button 
+        class="pagination-btn" 
+        (click)="nextPage()" 
+        [disabled]="currentPage === totalPages"
+        title="Página siguiente"
+      >
+        Siguiente ➡️
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación -->
+<app-confirm-dialog
+  [show]="showConfirmDialog"
+  [data]="confirmDialogData"
+  (confirm)="onConfirmDelete()"
+  (cancel)="onCancelDelete()"
+></app-confirm-dialog>

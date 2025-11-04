@@ -1,0 +1,95 @@
+<div class="form-container">
+  <div class="form-header">
+    <h1>{{ isEditMode ? 'Editar Proveedor' : 'Nuevo Proveedor' }}</h1>
+    <button class="btn-back" (click)="cancel()">← Volver</button>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <form [formGroup]="proveedorForm" (ngSubmit)="onSubmit()" class="proveedor-form">
+    <!-- Sección de Información de la Empresa -->
+    <div class="form-section">
+      <h2>🏢 Información de la Empresa</h2>
+      
+      <div class="form-group">
+        <label for="nombreEmpresa">Nombre de la Empresa *</label>
+        <input
+          type="text"
+          id="nombreEmpresa"
+          formControlName="nombreEmpresa"
+          placeholder="Ej: Hotel Los Tajibos"
+          [class.invalid]="isFieldInvalid('nombreEmpresa')"
+        />
+        <span class="error-text" *ngIf="isFieldInvalid('nombreEmpresa')">
+          El nombre de la empresa es requerido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="tipoServicio">Tipo de Servicio *</label>
+        <select 
+          id="tipoServicio" 
+          formControlName="tipoServicio"
+          [class.invalid]="isFieldInvalid('tipoServicio')"
+        >
+          <option value="">Seleccionar tipo...</option>
+          <option *ngFor="let tipo of tiposServicio" [value]="tipo">{{ tipo }}</option>
+        </select>
+        <span class="error-text" *ngIf="isFieldInvalid('tipoServicio')">
+          El tipo de servicio es requerido
+        </span>
+      </div>
+    </div>
+
+    <!-- Sección de Información de Contacto -->
+    <div class="form-section">
+      <h2>📞 Información de Contacto</h2>
+      
+      <div class="form-group">
+        <label for="contactoNombre">Nombre del Contacto</label>
+        <input
+          type="text"
+          id="contactoNombre"
+          formControlName="contactoNombre"
+          placeholder="Ej: Sr. Juan Pérez"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="contactoEmail">Email de Contacto</label>
+        <input
+          type="email"
+          id="contactoEmail"
+          formControlName="contactoEmail"
+          placeholder="Ej: contacto@empresa.com"
+          [class.invalid]="isFieldInvalid('contactoEmail')"
+        />
+        <span class="error-text" *ngIf="isFieldInvalid('contactoEmail') && proveedorForm.get('contactoEmail')?.hasError('email')">
+          El email no es válido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="contactoTelefono">Teléfono de Contacto</label>
+        <input
+          type="tel"
+          id="contactoTelefono"
+          formControlName="contactoTelefono"
+          placeholder="Ej: +591 3-1234567"
+        />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-submit" [disabled]="loading || proveedorForm.invalid">
+        <span *ngIf="!loading">{{ isEditMode ? '💾 Actualizar' : '➕ Crear' }} Proveedor</span>
+        <span *ngIf="loading">Procesando...</span>
+      </button>
+    </div>
+  </form>
+</div>

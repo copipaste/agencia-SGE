@@ -1,0 +1,165 @@
+<div class="dashboard-container" [class.sidebar-collapsed]="sidebarCollapsed">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo" *ngIf="!sidebarCollapsed">
+        <h2>🏖️ Agencia</h2>
+      </div>
+      <div class="logo-mini" *ngIf="sidebarCollapsed">
+        <h2>🏖️</h2>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <ul>
+        <li *ngFor="let item of menuItems; let i = index" 
+            [class.active]="item.active"
+            (click)="setActiveMenu(i)">
+          <a [routerLink]="item.route">
+            <span class="menu-icon">{{ item.icon }}</span>
+            <span class="menu-label" *ngIf="!sidebarCollapsed">{{ item.label }}</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info" *ngIf="!sidebarCollapsed && currentUser">
+        <div class="user-avatar">
+          {{ currentUser.nombre.charAt(0) }}{{ currentUser.apellido.charAt(0) }}
+        </div>
+        <div class="user-details">
+          <p class="user-name">{{ userName }}</p>
+          <p class="user-role">{{ userRole }}</p>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="logout()" [title]="sidebarCollapsed ? 'Cerrar Sesión' : ''">
+         
+        <span *ngIf="!sidebarCollapsed">Cerrar Sesión</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <button class="toggle-sidebar-btn" (click)="toggleSidebar()">
+        <span *ngIf="!sidebarCollapsed">☰</span>
+        <span *ngIf="sidebarCollapsed">→</span>
+      </button>
+      <div class="topbar-title">
+        <h1>Panel de Control</h1>
+      </div>
+      <div class="topbar-actions">
+        <div class="user-badge" *ngIf="currentUser">
+          <span class="user-avatar-small">
+            {{ currentUser.nombre.charAt(0) }}{{ currentUser.apellido.charAt(0) }}
+          </span>
+          <span class="user-name-small">{{ userName }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <main class="content">
+      <!-- Router Outlet para rutas hijas -->
+      <router-outlet></router-outlet>
+
+      <!-- Dashboard principal (solo se muestra cuando no hay ruta hija activa) -->
+      <div class="dashboard-home" *ngIf="!hasActiveChildRoute">
+        <div class="welcome-section">
+          <h2>¡Bienvenido de nuevo, {{ currentUser?.nombre }}!</h2>
+          <p>Este es tu panel de control de la Agencia de Viajes</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+              <h3>Clientes</h3>
+              <p class="stat-number">150</p>
+              <span class="stat-label">Total de clientes</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-content">
+              <h3>Paquetes</h3>
+              <p class="stat-number">45</p>
+              <span class="stat-label">Paquetes activos</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-content">
+              <h3>Ventas</h3>
+              <p class="stat-number">$125,450</p>
+              <span class="stat-label">Este mes</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">✈️</div>
+            <div class="stat-content">
+              <h3>Viajes</h3>
+              <p class="stat-number">89</p>
+              <span class="stat-label">Reservas activas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <h3>Acciones Rápidas</h3>
+          <div class="actions-grid">
+            <button class="action-btn" routerLink="/dashboard/clientes/nuevo">
+              <span class="action-icon">➕</span>
+              <span>Nuevo Cliente</span>
+            </button>
+            <button class="action-btn" routerLink="/dashboard/paquetes">
+              <span class="action-icon">📦</span>
+              <span>Crear Paquete</span>
+            </button>
+            <button class="action-btn" routerLink="/dashboard/ventas">
+              <span class="action-icon">💳</span>
+              <span>Nueva Venta</span>
+            </button>
+            <button class="action-btn" routerLink="/dashboard/servicios">
+              <span class="action-icon">🏨</span>
+              <span>Agregar Servicio</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="recent-activity">
+          <h3>Actividad Reciente</h3>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon">✅</div>
+              <div class="activity-content">
+                <p class="activity-title">Nueva reserva confirmada</p>
+                <p class="activity-time">Hace 5 minutos</p>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">👤</div>
+              <div class="activity-content">
+                <p class="activity-title">Cliente nuevo registrado</p>
+                <p class="activity-time">Hace 1 hora</p>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">📦</div>
+              <div class="activity-content">
+                <p class="activity-title">Paquete actualizado</p>
+                <p class="activity-time">Hace 2 horas</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

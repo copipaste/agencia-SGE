@@ -1,0 +1,78 @@
+<div class="show-container">
+  <div class="show-header">
+    <h1>Detalles del Proveedor</h1>
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <p>Cargando información del proveedor...</p>
+  </div>
+
+  <div class="proveedor-card" *ngIf="!loading && proveedor">
+    <!-- Encabezado con nombre del proveedor -->
+    <div class="card-header">
+      <div class="avatar">
+        <span>{{ getInitials() }}</span>
+      </div>
+      <div class="header-info">
+        <h2>{{ proveedor.nombreEmpresa }}</h2>
+        <span class="badge-tipo">{{ proveedor.tipoServicio }}</span>
+      </div>
+    </div>
+
+    <!-- Información de Contacto -->
+    <div class="info-section">
+      <h3>📞 Información de Contacto</h3>
+      <div class="info-grid">
+        <div class="info-item" *ngIf="proveedor.contactoNombre">
+          <span class="info-icon">👤</span>
+          <div class="info-content">
+            <label>Persona de Contacto:</label>
+            <p>{{ proveedor.contactoNombre }}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="proveedor.contactoEmail">
+          <span class="info-icon">📧</span>
+          <div class="info-content">
+            <label>Email de Contacto:</label>
+            <p>{{ proveedor.contactoEmail }}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="proveedor.contactoTelefono">
+          <span class="info-icon">📱</span>
+          <div class="info-content">
+            <label>Teléfono de Contacto:</label>
+            <p>{{ proveedor.contactoTelefono }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-contact-info" *ngIf="!proveedor.contactoNombre && !proveedor.contactoEmail && !proveedor.contactoTelefono">
+        <p>No hay información de contacto disponible</p>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="action-buttons">
+      <button class="btn-view" (click)="goBack()">
+        👁️ Ver Lista
+      </button>
+      <button class="btn-edit" (click)="editProveedor()">
+        ✏️ Editar
+      </button>
+      <button class="btn-delete" (click)="deleteProveedor()">
+        🗑️ Eliminar
+      </button>
+    </div>
+  </div>
+
+  <div class="no-data" *ngIf="!loading && !proveedor && !errorMessage">
+    <p>No se encontró información del proveedor</p>
+  </div>
+</div>

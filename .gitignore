@@ -1,0 +1,37 @@
+# Backend - Spring Boot
+agencia-backend/target/
+agencia-backend/.mvn/
+agencia-backend/mvnw
+agencia-backend/mvnw.cmd
+agencia-backend/.idea/
+agencia-backend/*.iml
+agencia-backend/.settings/
+agencia-backend/.classpath
+agencia-backend/.project
+agencia-backend/bin/
+
+# Frontend - Angular
+agencia-frontend/node_modules/
+agencia-frontend/dist/
+agencia-frontend/.angular/
+agencia-frontend/.vscode/
+agencia-frontend/*.log
+
+# Archivos de configuración sensibles (opcional - comentar si quieres incluirlos)
+# agencia-backend/src/main/resources/application.properties
+
+# Logs
+*.log
+*.logs
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

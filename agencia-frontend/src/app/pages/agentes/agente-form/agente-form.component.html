@@ -1,0 +1,137 @@
+<div class="form-container">
+  <div class="form-header">
+    <h1>{{ isEditMode ? 'Editar Agente' : 'Nuevo Agente' }}</h1>
+    <button class="btn-back" (click)="cancel()">← Volver</button>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <form [formGroup]="agenteForm" (ngSubmit)="onSubmit()" class="agente-form">
+    <!-- Sección de Información de Usuario (solo visible en modo creación) -->
+    <div class="form-section" *ngIf="!isEditMode">
+      <h2>👤 Información de Usuario</h2>
+      
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="ejemplo@correo.com"
+          [class.invalid]="isFieldInvalid('email')"
+        />
+        <span class="error-text" *ngIf="isFieldInvalid('email') && agenteForm.get('email')?.hasError('required')">
+          El email es requerido
+        </span>
+        <span class="error-text" *ngIf="isFieldInvalid('email') && agenteForm.get('email')?.hasError('email')">
+          El email no es válido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña *</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          placeholder="Mínimo 6 caracteres"
+          [class.invalid]="isFieldInvalid('password')"
+        />
+        <span class="error-text" *ngIf="isFieldInvalid('password') && agenteForm.get('password')?.hasError('required')">
+          La contraseña es requerida
+        </span>
+        <span class="error-text" *ngIf="isFieldInvalid('password') && agenteForm.get('password')?.hasError('minlength')">
+          La contraseña debe tener al menos 6 caracteres
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="nombre">Nombre *</label>
+        <input
+          type="text"
+          id="nombre"
+          formControlName="nombre"
+          placeholder="Ej: Juan"
+          [class.invalid]="isFieldInvalid('nombre')"
+        />
+        <span class="error-text" *ngIf="isFieldInvalid('nombre')">
+          El nombre es requerido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="apellido">Apellido *</label>
+        <input
+          type="text"
+          id="apellido"
+          formControlName="apellido"
+          placeholder="Ej: Pérez"
+          [class.invalid]="isFieldInvalid('apellido')"
+        />
+        <span class="error-text" *ngIf="isFieldInvalid('apellido')">
+          El apellido es requerido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input
+          type="tel"
+          id="telefono"
+          formControlName="telefono"
+          placeholder="Ej: +591 70123456"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="sexo">Sexo</label>
+        <select id="sexo" formControlName="sexo">
+          <option value="">Seleccionar...</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Sección de Información del Agente -->
+    <div class="form-section">
+      <h2>💼 Información Laboral</h2>
+      
+      <div class="form-group">
+        <label for="puesto">Puesto *</label>
+        <input
+          type="text"
+          id="puesto"
+          formControlName="puesto"
+          placeholder="Ej: Vendedor Senior, Supervisor de Ventas"
+          [class.invalid]="isFieldInvalid('puesto')"
+        />
+        <span class="error-text" *ngIf="isFieldInvalid('puesto')">
+          El puesto es requerido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="fechaContratacion">Fecha de Contratación</label>
+        <input
+          type="date"
+          id="fechaContratacion"
+          formControlName="fechaContratacion"
+        />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-submit" [disabled]="loading || agenteForm.invalid">
+        <span *ngIf="!loading">{{ isEditMode ? '💾 Actualizar' : '➕ Crear' }} Agente</span>
+        <span *ngIf="loading">Procesando...</span>
+      </button>
+    </div>
+  </form>
+</div>

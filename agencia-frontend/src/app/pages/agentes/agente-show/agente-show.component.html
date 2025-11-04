@@ -1,0 +1,97 @@
+<div class="show-container">
+  <div class="show-header">
+    <h1>Detalles del Agente</h1>
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <p>Cargando información del agente...</p>
+  </div>
+
+  <div class="agente-card" *ngIf="!loading && agente">
+    <!-- Encabezado con nombre del agente -->
+    <div class="card-header">
+      <div class="avatar">
+        <span>{{ agente.usuario?.nombre?.charAt(0) }}{{ agente.usuario?.apellido?.charAt(0) }}</span>
+      </div>
+      <h2>{{ agente.usuario?.nombre }} {{ agente.usuario?.apellido }}</h2>
+      <p class="puesto-badge">{{ agente.puesto }}</p>
+    </div>
+
+    <!-- Información del usuario -->
+    <div class="info-section">
+      <h3>👤 Información Personal</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-icon">📧</span>
+          <div class="info-content">
+            <label>Email:</label>
+            <p>{{ agente.usuario?.email }}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="agente.usuario?.telefono">
+          <span class="info-icon">📱</span>
+          <div class="info-content">
+            <label>Teléfono:</label>
+            <p>{{ agente.usuario?.telefono }}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="agente.usuario?.sexo">
+          <span class="info-icon">⚧</span>
+          <div class="info-content">
+            <label>Sexo:</label>
+            <p>{{ agente.usuario?.sexo }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información laboral -->
+    <div class="info-section">
+      <h3>💼 Información Laboral</h3>
+      <div class="info-grid">
+        <div class="info-item full-width">
+          <span class="info-icon">💼</span>
+          <div class="info-content">
+            <label>Puesto:</label>
+            <p>{{ agente.puesto }}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="agente.fechaContratacion">
+          <span class="info-icon">📅</span>
+          <div class="info-content">
+            <label>Fecha de Contratación:</label>
+            <p>{{ formatDate(agente.fechaContratacion) }}</p>
+            <span class="years-badge" *ngIf="calculateYearsWorked(agente.fechaContratacion) !== null">
+              {{ calculateYearsWorked(agente.fechaContratacion) }} años en la empresa
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="action-buttons">
+      <button class="btn-view" (click)="goBack()">
+        👁️ Ver Lista
+      </button>
+      <button class="btn-edit" (click)="editAgente()">
+        ✏️ Editar
+      </button>
+      <button class="btn-delete" (click)="deleteAgente()">
+        🗑️ Eliminar
+      </button>
+    </div>
+  </div>
+
+  <div class="no-data" *ngIf="!loading && !agente && !errorMessage">
+    <p>No se encontró información del agente</p>
+  </div>
+</div>

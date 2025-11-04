@@ -1,0 +1,50 @@
+<div class="modal-backdrop" *ngIf="show" (click)="onBackdropClick($event)">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">{{ data.title }}</h2>
+      <button class="close-button" (click)="onCancel()" type="button">✖</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="warning-icon">⚠️</div>
+      
+      <p class="modal-message">{{ data.message }}</p>
+      
+      <div class="item-highlight" *ngIf="data.itemName">
+        <strong>"{{ data.itemName }}"</strong>
+      </div>
+
+      <div class="additional-info" *ngIf="data.additionalInfo && data.additionalInfo.length > 0">
+        <div class="info-item" *ngFor="let info of data.additionalInfo">
+          <span class="info-label">{{ info.label }}:</span>
+          <span class="info-value">{{ info.value }}</span>
+        </div>
+      </div>
+
+      <div class="warning-message" *ngIf="data.warningMessage">
+        <span class="warning-icon-small">⚠️</span>
+        {{ data.warningMessage }}
+      </div>
+
+      <p class="action-irreversible">Esta acción no se puede deshacer.</p>
+    </div>
+
+    <div class="modal-footer">
+      <button 
+        class="btn btn-secondary" 
+        (click)="onCancel()"
+        type="button"
+      >
+        {{ data.cancelButtonText || 'Cancelar' }}
+      </button>
+      <button 
+        class="btn" 
+        [ngClass]="data.confirmButtonClass || 'btn-danger'" 
+        (click)="onConfirm()"
+        type="button"
+      >
+        {{ data.confirmButtonText || 'Eliminar' }}
+      </button>
+    </div>
+  </div>
+</div>

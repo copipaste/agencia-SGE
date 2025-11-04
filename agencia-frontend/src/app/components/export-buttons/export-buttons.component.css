@@ -1,0 +1,140 @@
+.export-container {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.btn-export:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-export:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.export-icon {
+  font-size: 16px;
+}
+
+.export-text {
+  font-weight: 600;
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+  transition: transform 0.3s;
+}
+
+.export-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  min-width: 280px;
+  z-index: 1001;
+  animation: slideDown 0.3s ease;
+  overflow: hidden;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.export-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: white;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+.export-option:last-child {
+  border-bottom: none;
+}
+
+.export-option:hover {
+  background: #f8f9fa;
+}
+
+.option-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.option-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.option-title {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.option-desc {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.export-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: 1000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .export-menu {
+    min-width: 240px;
+    right: 0;
+    left: auto;
+  }
+  
+  .btn-export {
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .export-text {
+    display: none;
+  }
+}

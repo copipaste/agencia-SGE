@@ -1,0 +1,104 @@
+<div class="show-container">
+  <div class="show-header">
+    <h1>Detalles del Cliente</h1>
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <p>Cargando información del cliente...</p>
+  </div>
+
+  <div class="cliente-card" *ngIf="!loading && cliente">
+    <!-- Encabezado con nombre del cliente -->
+    <div class="card-header">
+      <div class="avatar">
+        <span>{{ cliente.usuario?.nombre?.charAt(0) }}{{ cliente.usuario?.apellido?.charAt(0) }}</span>
+      </div>
+      <h2>{{ cliente.usuario?.nombre }} {{ cliente.usuario?.apellido }}</h2>
+    </div>
+
+    <!-- Información del usuario -->
+    <div class="info-section">
+      <h3>👤 Información Personal</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-icon">📧</span>
+          <div class="info-content">
+            <label>Email:</label>
+            <p>{{ cliente.usuario?.email }}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="cliente.usuario?.telefono">
+          <span class="info-icon">📱</span>
+          <div class="info-content">
+            <label>Teléfono:</label>
+            <p>{{ cliente.usuario?.telefono }}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="cliente.usuario?.sexo">
+          <span class="info-icon">⚧</span>
+          <div class="info-content">
+            <label>Sexo:</label>
+            <p>{{ cliente.usuario?.sexo }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del cliente -->
+    <div class="info-section">
+      <h3>🏠 Información de Residencia</h3>
+      <div class="info-grid">
+        <div class="info-item full-width">
+          <span class="info-icon">🏠</span>
+          <div class="info-content">
+            <label>Dirección:</label>
+            <p>{{ cliente.direccion }}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="cliente.fechaNacimiento">
+          <span class="info-icon">🎂</span>
+          <div class="info-content">
+            <label>Fecha de Nacimiento:</label>
+            <p>{{ formatDate(cliente.fechaNacimiento) }}</p>
+            <span class="age-badge" *ngIf="calculateAge(cliente.fechaNacimiento)">
+              {{ calculateAge(cliente.fechaNacimiento) }} años
+            </span>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <span class="info-icon">🛂</span>
+          <div class="info-content">
+            <label>Pasaporte:</label>
+            <p>{{ cliente.numeroPasaporte }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="action-buttons">
+      <button class="btn-view" (click)="goBack()">
+        👁️ Ver Lista
+      </button>
+      <button class="btn-edit" (click)="editCliente()">
+        ✏️ Editar
+      </button>
+      <button class="btn-delete" (click)="deleteCliente()">
+        🗑️ Eliminar
+      </button>
+    </div>
+  </div>
+
+  <div class="no-data" *ngIf="!loading && !cliente && !errorMessage">
+    <p>No se encontró información del cliente</p>
+  </div>
+</div>

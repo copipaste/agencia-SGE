@@ -1,0 +1,124 @@
+<div class="filter-panel">
+  <div class="filter-header">
+    <h3>
+      <span class="filter-icon">🔍</span>
+      Filtros
+      <span class="active-badge" *ngIf="hasActiveFilters()">
+        {{ getActiveFiltersCount() }}
+      </span>
+    </h3>
+    <button class="toggle-btn" (click)="togglePanel()" type="button">
+      {{ showPanel ? '▲' : '▼' }}
+    </button>
+  </div>
+
+  <div class="filter-content" *ngIf="showPanel">
+    <div class="filter-grid">
+      <div class="filter-item" *ngFor="let filter of filters">
+        <!-- TEXT INPUT -->
+        <div *ngIf="filter.type === 'text'" class="filter-field">
+          <label [for]="filter.key">{{ filter.label }}</label>
+          <input
+            [id]="filter.key"
+            type="text"
+            [(ngModel)]="filterValues[filter.key]"
+            (ngModelChange)="onFilterChange()"
+            [placeholder]="filter.placeholder || ''"
+            class="filter-input"
+          />
+        </div>
+
+        <!-- SELECT -->
+        <div *ngIf="filter.type === 'select'" class="filter-field">
+          <label [for]="filter.key">{{ filter.label }}</label>
+          <select
+            [id]="filter.key"
+            [(ngModel)]="filterValues[filter.key]"
+            (ngModelChange)="onFilterChange()"
+            class="filter-select"
+          >
+            <option [value]="undefined">Todos</option>
+            <option *ngFor="let option of filter.options" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- DATE -->
+        <div *ngIf="filter.type === 'date'" class="filter-field">
+          <label [for]="filter.key">{{ filter.label }}</label>
+          <input
+            [id]="filter.key"
+            type="date"
+            [(ngModel)]="filterValues[filter.key]"
+            (ngModelChange)="onFilterChange()"
+            class="filter-input"
+          />
+        </div>
+
+        <!-- NUMBER -->
+        <div *ngIf="filter.type === 'number'" class="filter-field">
+          <label [for]="filter.key">{{ filter.label }}</label>
+          <input
+            [id]="filter.key"
+            type="number"
+            [(ngModel)]="filterValues[filter.key]"
+            (ngModelChange)="onFilterChange()"
+            [placeholder]="filter.placeholder || ''"
+            [min]="filter.min ?? null"
+            [max]="filter.max ?? null"
+            class="filter-input"
+          />
+        </div>
+
+        <!-- BOOLEAN -->
+        <div *ngIf="filter.type === 'boolean'" class="filter-field">
+          <label [for]="filter.key">{{ filter.label }}</label>
+          <select
+            [id]="filter.key"
+            [(ngModel)]="filterValues[filter.key]"
+            (ngModelChange)="onFilterChange()"
+            class="filter-select"
+          >
+            <option [ngValue]="undefined">Todos</option>
+            <option [ngValue]="true">Sí</option>
+            <option [ngValue]="false">No</option>
+          </select>
+        </div>
+
+        <!-- RANGE (precio) -->
+        <div *ngIf="filter.type === 'range'" class="filter-field range-field">
+          <label>{{ filter.label }}</label>
+          <div class="range-inputs">
+            <input
+              type="number"
+              [value]="getRangeValue(filter.key, 'Min')"
+              (input)="setRangeValue(filter.key, 'Min', $event)"
+              placeholder="Mín"
+              class="filter-input range-input"
+            />
+            <span class="range-separator">-</span>
+            <input
+              type="number"
+              [value]="getRangeValue(filter.key, 'Max')"
+              (input)="setRangeValue(filter.key, 'Max', $event)"
+              placeholder="Máx"
+              class="filter-input range-input"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-actions">
+      <button 
+        class="btn-clear-filters" 
+        (click)="onClearFilters()" 
+        type="button"
+        [disabled]="!hasActiveFilters()"
+      >
+        ✖ Limpiar Filtros
+      </button>
+    </div>
+  </div>
+</div>

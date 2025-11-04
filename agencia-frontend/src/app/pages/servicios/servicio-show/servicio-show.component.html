@@ -1,0 +1,129 @@
+<div class="show-container">
+  <div class="show-header">
+    <h1>Detalles del Servicio</h1>
+    <button class="btn-back" (click)="goBack()">← Volver</button>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <p>Cargando información del servicio...</p>
+  </div>
+
+  <div class="servicio-card" *ngIf="!loading && servicio">
+    <!-- Encabezado con nombre del servicio -->
+    <div class="card-header">
+      <div class="header-left">
+        <div class="tipo-icon-large">{{ getIconByTipo(servicio.tipoServicio) }}</div>
+        <div class="header-info">
+          <span class="badge-tipo">{{ servicio.tipoServicio }}</span>
+          <h2>{{ servicio.nombreServicio }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información Básica -->
+    <div class="info-section">
+      <h3>📋 Información Básica</h3>
+      <div class="info-grid">
+        <div class="info-item full-width" *ngIf="servicio.descripcion">
+          <span class="info-icon">📝</span>
+          <div class="info-content">
+            <label>Descripción:</label>
+            <p>{{ servicio.descripcion }}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="servicio.proveedor">
+          <span class="info-icon">🏢</span>
+          <div class="info-content">
+            <label>Proveedor:</label>
+            <p>{{ servicio.proveedor.nombreEmpresa }}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="!servicio.proveedor">
+          <span class="info-icon">🏢</span>
+          <div class="info-content">
+            <label>Proveedor:</label>
+            <p class="no-data">Sin proveedor asignado</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información de Destino -->
+    <div class="info-section" *ngIf="servicio.destinoCiudad || servicio.destinoPais">
+      <h3>📍 Información de Destino</h3>
+      <div class="info-grid">
+        <div class="info-item" *ngIf="servicio.destinoCiudad">
+          <span class="info-icon">🏙️</span>
+          <div class="info-content">
+            <label>Ciudad:</label>
+            <p>{{ servicio.destinoCiudad }}</p>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="servicio.destinoPais">
+          <span class="info-icon">🌍</span>
+          <div class="info-content">
+            <label>País:</label>
+            <p>{{ servicio.destinoPais }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información de Precios -->
+    <div class="info-section">
+      <h3>💰 Información de Precios</h3>
+      <div class="pricing-details">
+        <div class="price-card" *ngIf="servicio.precioCosto">
+          <div class="price-label">Precio de Costo</div>
+          <div class="price-amount cost">Bs {{ servicio.precioCosto | number:'1.2-2' }}</div>
+        </div>
+
+        <div class="price-card" *ngIf="servicio.precioVenta">
+          <div class="price-label">Precio de Venta</div>
+          <div class="price-amount sale">Bs {{ servicio.precioVenta | number:'1.2-2' }}</div>
+        </div>
+
+        <div class="price-card" *ngIf="calculateMargin()">
+          <div class="price-label">Margen de Ganancia</div>
+          <div class="price-amount margin">
+            Bs {{ calculateMargin() | number:'1.2-2' }}
+            <span class="margin-percentage" *ngIf="calculateMarginPercentage()">
+              ({{ calculateMarginPercentage() | number:'1.1-1' }}%)
+            </span>
+          </div>
+        </div>
+
+        <div class="price-card">
+          <div class="price-label">Estado del Servicio</div>
+          <div class="price-amount" [ngClass]="servicio.isAvailable ? 'status-available' : 'status-unavailable'">
+            {{ servicio.isAvailable ? '✅ Disponible' : '❌ No Disponible' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="action-buttons">
+      <button class="btn-view" (click)="goBack()">
+        👁️ Ver Lista
+      </button>
+      <button class="btn-edit" (click)="editServicio()">
+        ✏️ Editar
+      </button>
+      <button class="btn-delete" (click)="deleteServicio()">
+        🗑️ Eliminar
+      </button>
+    </div>
+  </div>
+
+  <div class="no-data" *ngIf="!loading && !servicio && !errorMessage">
+    <p>No se encontró información del servicio</p>
+  </div>
+</div>

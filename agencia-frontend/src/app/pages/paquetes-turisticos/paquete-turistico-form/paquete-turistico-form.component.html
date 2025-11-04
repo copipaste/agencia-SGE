@@ -1,0 +1,158 @@
+<div class="container">
+  <div class="form-card">
+    <h1>{{ isEditMode ? '✏️ Editar Paquete Turístico' : '➕ Nuevo Paquete Turístico' }}</h1>
+
+    <div *ngIf="error" class="alert alert-error">
+      ❌ {{ error }}
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #paqueteForm="ngForm">
+      
+      <!-- Información básica -->
+      <div class="form-section">
+        <h2>📋 Información Básica</h2>
+        
+        <div class="form-group">
+          <label for="nombrePaquete">Nombre del Paquete *</label>
+          <input
+            type="text"
+            id="nombrePaquete"
+            name="nombrePaquete"
+            [(ngModel)]="paquete.nombrePaquete"
+            required
+            placeholder="Ej: Tour Caribe Premium"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            [(ngModel)]="paquete.descripcion"
+            rows="4"
+            placeholder="Describe el paquete turístico..."
+            class="form-control"
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="destinoPrincipal">Destino Principal *</label>
+            <input
+              type="text"
+              id="destinoPrincipal"
+              name="destinoPrincipal"
+              [(ngModel)]="paquete.destinoPrincipal"
+              required
+              placeholder="Ej: Cancún"
+              class="form-control"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="duracionDias">Duración (días)</label>
+            <input
+              type="number"
+              id="duracionDias"
+              name="duracionDias"
+              [(ngModel)]="paquete.duracionDias"
+              min="1"
+              placeholder="7"
+              class="form-control"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="precioTotalVenta">Precio Total de Venta ($)</label>
+          <input
+            type="number"
+            id="precioTotalVenta"
+            name="precioTotalVenta"
+            [(ngModel)]="paquete.precioTotalVenta"
+            min="0"
+            step="0.01"
+            placeholder="1500.00"
+            class="form-control"
+          />
+          <button
+            type="button"
+            class="btn-calcular"
+            (click)="calcularPrecioTotal()"
+          >
+            🧮 Calcular desde servicios
+          </button>
+        </div>
+      </div>
+
+      <!-- Selección de servicios -->
+      <div class="form-section">
+        <h2>🎯 Servicios Incluidos</h2>
+        
+        <div class="form-group">
+          <input
+            type="text"
+            [(ngModel)]="searchServicio"
+            name="searchServicio"
+            placeholder="🔍 Buscar servicios..."
+            class="form-control search-servicios"
+          />
+        </div>
+
+        <p class="info-text">
+          Seleccionados: <strong>{{ serviciosSeleccionados.length }}</strong> servicios
+        </p>
+
+        <div class="servicios-grid">
+          <div
+            *ngFor="let servicio of getServiciosFiltrados()"
+            class="servicio-item"
+            [class.selected]="isServicioSeleccionado(servicio.id)"
+            (click)="toggleServicio(servicio.id!)"
+          >
+            <div class="servicio-checkbox">
+              <input
+                type="checkbox"
+                [checked]="isServicioSeleccionado(servicio.id)"
+                (click)="$event.stopPropagation()"
+              />
+            </div>
+            
+            <div class="servicio-info">
+              <h4>{{ servicio.nombreServicio }}</h4>
+              <p class="servicio-tipo">
+                <span class="badge-tipo">{{ servicio.tipoServicio }}</span>
+              </p>
+              <p class="servicio-destino" *ngIf="servicio.destinoCiudad">
+                📍 {{ servicio.destinoCiudad }}{{ servicio.destinoPais ? ', ' + servicio.destinoPais : '' }}
+              </p>
+              <p class="servicio-precio" *ngIf="servicio.precioVenta">
+                💰 ${{ servicio.precioVenta }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="getServiciosFiltrados().length === 0" class="empty-servicios">
+          No se encontraron servicios
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="loading">
+          ❌ Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn-submit"
+          [disabled]="!paqueteForm.form.valid || loading"
+        >
+          {{ loading ? '⏳ Procesando...' : (isEditMode ? '💾 Actualizar' : '➕ Crear') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

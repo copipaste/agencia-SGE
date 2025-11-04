@@ -1,0 +1,65 @@
+<div class="export-container">
+  <button 
+    class="btn-export" 
+    (click)="toggleMenu()"
+    [disabled]="!hasData"
+    [title]="hasData ? 'Exportar datos' : 'No hay datos para exportar'"
+  >
+    <span class="export-icon">📥</span>
+    <span class="export-text">Exportar</span>
+    <span class="dropdown-arrow">{{ showMenu ? '▲' : '▼' }}</span>
+  </button>
+
+  <div class="export-menu" *ngIf="showMenu">
+    <button 
+      class="export-option" 
+      (click)="exportToExcel()"
+      *ngIf="showExcel"
+    >
+      <span class="option-icon">📊</span>
+      <div class="option-details">
+        <span class="option-title">Exportar a Excel</span>
+        <span class="option-desc">Archivo .xls con formato</span>
+      </div>
+    </button>
+
+    <button 
+      class="export-option" 
+      (click)="exportToCSV()"
+      *ngIf="showCSV"
+    >
+      <span class="option-icon">📄</span>
+      <div class="option-details">
+        <span class="option-title">Exportar a CSV</span>
+        <span class="option-desc">Compatible con Excel</span>
+      </div>
+    </button>
+
+    <button 
+      class="export-option" 
+      (click)="exportToJSON()"
+      *ngIf="showJSON"
+    >
+      <span class="option-icon">🔧</span>
+      <div class="option-details">
+        <span class="option-title">Exportar a JSON</span>
+        <span class="option-desc">Formato de datos estructurado</span>
+      </div>
+    </button>
+
+    <button 
+      class="export-option" 
+      (click)="print()"
+      *ngIf="showPrint"
+    >
+      <span class="option-icon">🖨️</span>
+      <div class="option-details">
+        <span class="option-title">Imprimir</span>
+        <span class="option-desc">Generar vista de impresión</span>
+      </div>
+    </button>
+  </div>
+
+  <!-- Backdrop para cerrar el menú -->
+  <div class="export-backdrop" *ngIf="showMenu" (click)="toggleMenu()"></div>
+</div>
