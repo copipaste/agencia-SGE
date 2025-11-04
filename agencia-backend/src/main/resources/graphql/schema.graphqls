@@ -1,0 +1,435 @@
+# Schema principal de GraphQL para Agencia de Viajes
+
+# ============================================
+# QUERIES (Consultas)
+# ============================================
+type Query {
+    # Obtener información del usuario actual autenticado
+    me: Usuario
+    
+    # Endpoint de prueba
+    hello: String!
+    
+    # ========== CLIENTES ==========
+    # Obtener todos los clientes
+    getAllClientes: [Cliente!]!
+    
+    # Obtener cliente por ID
+    getClienteById(id: ID!): Cliente
+    
+    # Obtener cliente por usuario ID
+    getClienteByUsuarioId(usuarioId: ID!): Cliente
+    
+    # Buscar clientes por nombre o apellido
+    searchClientes(searchTerm: String!): [Cliente!]!
+    
+    # ========== AGENTES ==========
+    # Obtener todos los agentes
+    getAllAgentes: [Agente!]!
+    
+    # Obtener agente por ID
+    getAgenteById(id: ID!): Agente
+    
+    # Obtener agente por usuario ID
+    getAgenteByUsuarioId(usuarioId: ID!): Agente
+    
+    # Buscar agentes por nombre o apellido
+    searchAgentes(searchTerm: String!): [Agente!]!
+    
+    # ========== PROVEEDORES ==========
+    # Obtener todos los proveedores
+    getAllProveedores: [Proveedor!]!
+    
+    # Obtener proveedor por ID
+    getProveedorById(id: ID!): Proveedor
+    
+    # Obtener proveedores por tipo de servicio
+    getProveedoresByTipoServicio(tipoServicio: String!): [Proveedor!]!
+    
+    # Buscar proveedores por nombre de empresa
+    searchProveedores(searchTerm: String!): [Proveedor!]!
+    
+    # ========== SERVICIOS ==========
+    # Obtener todos los servicios
+    getAllServicios: [Servicio!]!
+    
+    # Obtener servicio por ID
+    getServicioById(id: ID!): Servicio
+    
+    # Obtener servicios por proveedor
+    getServiciosByProveedorId(proveedorId: ID!): [Servicio!]!
+    
+    # Obtener servicios por tipo
+    getServiciosByTipo(tipoServicio: String!): [Servicio!]!
+    
+    # Obtener servicios por destino
+    getServiciosByDestino(destinoCiudad: String!): [Servicio!]!
+    
+    # Buscar servicios
+    searchServicios(searchTerm: String!): [Servicio!]!
+    
+    # ========== PAQUETES TURÍSTICOS ==========
+    # Obtener todos los paquetes turísticos
+    getAllPaquetesTuristicos: [PaqueteTuristico!]!
+    
+    # Obtener paquete turístico por ID
+    getPaqueteTuristicoById(id: ID!): PaqueteTuristico
+    
+    # Obtener paquetes turísticos por destino
+    getPaquetesTuristicosByDestino(destino: String!): [PaqueteTuristico!]!
+    
+    # Buscar paquetes turísticos por nombre o descripción
+    searchPaquetesTuristicos(keyword: String!): [PaqueteTuristico!]!
+    
+    # ========== VENTAS ==========
+    # Obtener todas las ventas
+    getAllVentas: [Venta!]!
+    
+    # Obtener venta por ID
+    getVentaById(id: ID!): Venta
+    
+    # Obtener ventas por cliente
+    getVentasByClienteId(clienteId: ID!): [Venta!]!
+    
+    # Obtener ventas por agente
+    getVentasByAgenteId(agenteId: ID!): [Venta!]!
+    
+    # Obtener ventas por estado
+    getVentasByEstado(estado: String!): [Venta!]!
+}
+
+# ============================================
+# MUTATIONS (Operaciones de escritura)
+# ============================================
+type Mutation {
+    # Registrar nuevo usuario
+    register(input: RegisterInput!): AuthPayload!
+    
+    # Iniciar sesión
+    login(input: LoginInput!): AuthPayload!
+    
+    # ========== CLIENTES ==========
+    # Crear nuevo cliente
+    createCliente(input: CreateClienteInput!): Cliente!
+    
+    # Actualizar cliente existente
+    updateCliente(id: ID!, input: UpdateClienteInput!): Cliente!
+    
+    # Eliminar cliente (soft delete)
+    deleteCliente(id: ID!): Boolean!
+    
+    # Activar/Desactivar cliente
+    toggleClienteStatus(id: ID!): Cliente!
+    
+    # ========== AGENTES ==========
+    # Crear nuevo agente
+    createAgente(input: CreateAgenteInput!): Agente!
+    
+    # Actualizar agente existente
+    updateAgente(id: ID!, input: UpdateAgenteInput!): Agente!
+    
+    # Eliminar agente
+    deleteAgente(id: ID!): Boolean!
+    
+    # Activar/Desactivar agente
+    toggleAgenteStatus(id: ID!): Agente!
+    
+    # ========== PROVEEDORES ==========
+    # Crear nuevo proveedor
+    createProveedor(input: CreateProveedorInput!): Proveedor!
+    
+    # Actualizar proveedor existente
+    updateProveedor(id: ID!, input: UpdateProveedorInput!): Proveedor!
+    
+    # Eliminar proveedor
+    deleteProveedor(id: ID!): Boolean!
+    
+    # ========== SERVICIOS ==========
+    # Crear nuevo servicio
+    createServicio(input: CreateServicioInput!): Servicio!
+    
+    # Actualizar servicio existente
+    updateServicio(id: ID!, input: UpdateServicioInput!): Servicio!
+    
+    # Eliminar servicio
+    deleteServicio(id: ID!): Boolean!
+    
+    # ========== PAQUETES TURÍSTICOS ==========
+    # Crear nuevo paquete turístico
+    createPaqueteTuristico(input: CreatePaqueteTuristicoInput!): PaqueteTuristico!
+    
+    # Actualizar paquete turístico existente
+    updatePaqueteTuristico(id: ID!, input: UpdatePaqueteTuristicoInput!): PaqueteTuristico!
+    
+    # Eliminar paquete turístico
+    deletePaqueteTuristico(id: ID!): Boolean!
+    
+    # Agregar servicio a un paquete
+    addServicioToPaquete(paqueteId: ID!, servicioId: ID!): Boolean!
+    
+    # Eliminar servicio de un paquete
+    removeServicioFromPaquete(paqueteId: ID!, servicioId: ID!): Boolean!
+    
+    # ========== VENTAS ==========
+    # Crear nueva venta
+    createVenta(input: CreateVentaInput!): Venta!
+    
+    # Actualizar venta existente
+    updateVenta(id: ID!, input: UpdateVentaInput!): Venta!
+    
+    # Eliminar venta
+    deleteVenta(id: ID!): Boolean!
+}
+
+# ============================================
+# TYPES (Tipos de datos)
+# ============================================
+
+# Respuesta de autenticación con token JWT
+type AuthPayload {
+    token: String!
+    type: String!
+    usuario: Usuario!
+}
+
+# Usuario del sistema
+type Usuario {
+    id: ID!
+    email: String!
+    nombre: String!
+    apellido: String!
+    telefono: String
+    sexo: String
+    isAdmin: Boolean!
+    isAgente: Boolean!
+    isCliente: Boolean!
+    isActive: Boolean!
+}
+
+# Cliente
+type Cliente {
+    id: ID!
+    usuarioId: ID!
+    usuario: Usuario
+    direccion: String!
+    fechaNacimiento: String
+    numeroPasaporte: String!
+}
+
+# Agente
+type Agente {
+    id: ID!
+    usuarioId: ID!
+    usuario: Usuario
+    puesto: String!
+    fechaContratacion: String
+}
+
+# Proveedor
+type Proveedor {
+    id: ID!
+    nombreEmpresa: String!
+    tipoServicio: String!
+    contactoNombre: String
+    contactoEmail: String
+    contactoTelefono: String
+}
+
+# Servicio
+type Servicio {
+    id: ID!
+    proveedorId: ID
+    proveedor: Proveedor
+    tipoServicio: String!
+    nombreServicio: String!
+    descripcion: String
+    destinoCiudad: String
+    destinoPais: String
+    precioCosto: Float
+    precioVenta: Float
+    isAvailable: Boolean
+}
+
+# Paquete Turístico
+type PaqueteTuristico {
+    id: ID!
+    nombrePaquete: String!
+    descripcion: String
+    destinoPrincipal: String!
+    duracionDias: Int
+    precioTotalVenta: Float
+    servicios: [Servicio!]!
+}
+
+# Venta
+type Venta {
+    id: ID!
+    clienteId: ID!
+    cliente: Cliente
+    agenteId: ID!
+    agente: Agente
+    fechaVenta: String!
+    montoTotal: Float!
+    estadoVenta: String!
+    metodoPago: String!
+    detalles: [DetalleVenta!]!
+}
+
+# Detalle de Venta
+type DetalleVenta {
+    id: ID!
+    ventaId: ID!
+    servicioId: ID
+    servicio: Servicio
+    paqueteId: ID
+    paquete: PaqueteTuristico
+    cantidad: Int!
+    precioUnitarioVenta: Float!
+    subtotal: Float!
+}
+
+# ============================================
+# INPUTS (Datos de entrada)
+# ============================================
+
+# Input para registro de usuario
+input RegisterInput {
+    email: String!
+    password: String!
+    nombre: String!
+    apellido: String!
+    telefono: String
+    sexo: String
+}
+
+# Input para login
+input LoginInput {
+    email: String!
+    password: String!
+}
+
+# Input para crear cliente (incluye datos del usuario)
+input CreateClienteInput {
+    email: String!
+    password: String!
+    nombre: String!
+    apellido: String!
+    telefono: String
+    sexo: String
+    direccion: String!
+    fechaNacimiento: String
+    numeroPasaporte: String!
+}
+
+# Input para actualizar cliente
+input UpdateClienteInput {
+    direccion: String
+    fechaNacimiento: String
+    numeroPasaporte: String
+}
+
+# Input para crear agente (incluye datos del usuario)
+input CreateAgenteInput {
+    email: String!
+    password: String!
+    nombre: String!
+    apellido: String!
+    telefono: String
+    sexo: String
+    puesto: String!
+    fechaContratacion: String
+}
+
+# Input para actualizar agente
+input UpdateAgenteInput {
+    puesto: String
+    fechaContratacion: String
+}
+
+# Input para crear proveedor
+input CreateProveedorInput {
+    nombreEmpresa: String!
+    tipoServicio: String!
+    contactoNombre: String
+    contactoEmail: String
+    contactoTelefono: String
+}
+
+# Input para actualizar proveedor
+input UpdateProveedorInput {
+    nombreEmpresa: String
+    tipoServicio: String
+    contactoNombre: String
+    contactoEmail: String
+    contactoTelefono: String
+}
+
+# Input para crear servicio
+input CreateServicioInput {
+    proveedorId: ID
+    tipoServicio: String!
+    nombreServicio: String!
+    descripcion: String
+    destinoCiudad: String
+    destinoPais: String
+    precioCosto: Float
+    precioVenta: Float
+    isAvailable: Boolean
+}
+
+# Input para actualizar servicio
+input UpdateServicioInput {
+    proveedorId: ID
+    tipoServicio: String
+    nombreServicio: String
+    descripcion: String
+    destinoCiudad: String
+    destinoPais: String
+    precioCosto: Float
+    precioVenta: Float
+    isAvailable: Boolean
+}
+
+# Input para crear paquete turístico
+input CreatePaqueteTuristicoInput {
+    nombrePaquete: String!
+    descripcion: String
+    destinoPrincipal: String!
+    duracionDias: Int
+    precioTotalVenta: Float
+    serviciosIds: [ID!]
+}
+
+# Input para actualizar paquete turístico
+input UpdatePaqueteTuristicoInput {
+    nombrePaquete: String
+    descripcion: String
+    destinoPrincipal: String
+    duracionDias: Int
+    precioTotalVenta: Float
+    serviciosIds: [ID!]
+}
+
+# Input para item de detalle de venta
+input DetalleVentaItemInput {
+    servicioId: ID
+    paqueteId: ID
+    cantidad: Int!
+    precioUnitarioVenta: Float!
+}
+
+# Input para crear venta
+input CreateVentaInput {
+    clienteId: ID!
+    agenteId: ID!
+    estadoVenta: String!
+    metodoPago: String!
+    detalles: [DetalleVentaItemInput!]!
+}
+
+# Input para actualizar venta
+input UpdateVentaInput {
+    estadoVenta: String
+    metodoPago: String
+    detalles: [DetalleVentaItemInput!]
+}

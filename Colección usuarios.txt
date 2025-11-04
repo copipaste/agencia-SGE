@@ -1,0 +1,95 @@
+Colección: usuarios
+
+{
+  "_id": ObjectId,
+  "email": "usuario@email.com",
+  "password": "hash_password",
+  "nombre": "Nombre",
+  "apellido": "Apellido",
+  "telefono": "123456789",
+  "sexo": "M o F",
+  "isAdmin": false,
+  "isAgente": false,
+  "isCliente": false,
+  "isActive": true
+}
+Colección: clientes
+
+{
+  "_id": ObjectId,
+  "usuarioId": ObjectId, // referencia a 'usuarios'
+  "direccion": "Calle Falsa 123",
+  "fechaNacimiento": ISODate("1990-01-01"),
+  "numeroPasaporte": "AB123456"
+}
+Colección: agentes
+
+{
+  "_id": ObjectId,
+  "usuarioId": ObjectId, // referencia a 'usuarios'
+  "puesto": "Vendedor",
+  "fechaContratacion": ISODate("2021-01-10")
+}
+Colección: proveedores
+
+{
+  "_id": ObjectId,
+  "nombreEmpresa": "Hotel Los Tajibos",
+  "tipoServicio": "Hotel",
+  "contactoNombre": "Sr. Turismo",
+  "contactoEmail": "contacto@hotel.com",
+  "contactoTelefono": "789456123"
+}
+Colección: ventas
+
+{
+  "_id": ObjectId,
+  "clienteId": ObjectId, // referencia a 'clientes'
+  "agenteId": ObjectId, // referencia a 'agentes'
+  "fechaVenta": ISODate("2025-10-31T15:00:00Z"),
+  "montoTotal": 999.99,
+  "estadoVenta": "Pendiente",
+  "metodoPago": "Tarjeta"
+}
+Colección: servicios
+
+{
+  "_id": ObjectId,
+  "proveedorId": ObjectId, // referencia a 'proveedores'
+  "tipoServicio": "Vuelo",
+  "nombreServicio": "Vuelo Santa Cruz - La Paz",
+  "descripcion": "Vuelo directo",
+  "destinoCiudad": "La Paz",
+  "destinoPais": "Bolivia",
+  "precioCosto": 350.00,
+  "precioVenta": 400.00,
+  "isAvailable": true
+}
+Colección: paquetesTuristicos
+
+{
+  "_id": ObjectId,
+  "nombrePaquete": "Paquete La Paz",
+  "descripcion": "Tour de 3 días",
+  "destinoPrincipal": "La Paz",
+  "duracionDias": 3,
+  "precioTotalVenta": 1200.00
+}
+Colección: detalleVenta
+
+{
+  "_id": ObjectId,
+  "ventaId": ObjectId, // referencia a 'ventas'
+  "servicioId": ObjectId, // puede ser nulo
+  "paqueteId": ObjectId, // puede ser nulo
+  "cantidad": 2,
+  "precioUnitarioVenta": 400.00,
+  "subtotal": 800.00
+}
+Colección: paqueteServicios
+
+{
+  "_id": ObjectId,
+  "paqueteId": ObjectId, // referencia a 'paquetesTuristicos'
+  "servicioId": ObjectId // referencia a 'servicios'
+}
