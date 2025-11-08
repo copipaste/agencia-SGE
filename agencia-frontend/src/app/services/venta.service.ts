@@ -96,4 +96,18 @@ export class VentaService {
       variables: { id }
     }).pipe(map(result => result.data.deleteVenta));
   }
+
+  notificarVenta(ventaId: string): Observable<{ success: boolean; message: string }> {
+    return this.apollo.mutate<any>({
+      mutation: gql`
+        mutation NotificarVenta($ventaId: ID!) {
+          notificarVenta(ventaId: $ventaId) {
+            success
+            message
+          }
+        }
+      `,
+      variables: { ventaId }
+    }).pipe(map(result => result.data.notificarVenta));
+  }
 }

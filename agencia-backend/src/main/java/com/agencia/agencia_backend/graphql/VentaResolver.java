@@ -10,6 +10,7 @@ import com.agencia.agencia_backend.model.Servicio;
 import com.agencia.agencia_backend.model.Venta;
 import com.agencia.agencia_backend.service.AgenteService;
 import com.agencia.agencia_backend.service.ClienteService;
+import com.agencia.agencia_backend.service.NotificacionService;
 import com.agencia.agencia_backend.service.PaqueteTuristicoService;
 import com.agencia.agencia_backend.service.ServicioService;
 import com.agencia.agencia_backend.service.VentaService;
@@ -40,6 +41,9 @@ public class VentaResolver {
     
     @Autowired
     private PaqueteTuristicoService paqueteTuristicoService;
+    
+    @Autowired
+    private NotificacionService notificacionService;
 
     // QUERIES
 
@@ -93,6 +97,12 @@ public class VentaResolver {
     @PreAuthorize("hasRole('ADMIN')")
     public Boolean deleteVenta(@Argument String id) {
         return ventaService.deleteVenta(id);
+    }
+
+    @MutationMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'AGENTE')")
+    public NotificacionService.NotificacionResponse notificarVenta(@Argument String ventaId) {
+        return notificacionService.enviarNotificacion(ventaId);
     }
 
     // FIELD RESOLVERS

@@ -179,6 +179,9 @@ type Mutation {
     
     # Eliminar venta
     deleteVenta(id: ID!): Boolean!
+    
+    # Notificar venta via webhook
+    notificarVenta(ventaId: ID!): NotificacionResponse!
 }
 
 # ============================================
@@ -190,6 +193,12 @@ type AuthPayload {
     token: String!
     type: String!
     usuario: Usuario!
+}
+
+# Respuesta de notificación webhook
+type NotificacionResponse {
+    success: Boolean!
+    message: String!
 }
 
 # Usuario del sistema

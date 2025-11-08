@@ -55,6 +55,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers("/graphiql/**").permitAll()
                     .requestMatchers("/graphql").permitAll()
+                    .requestMatchers("/api/reportes/**").permitAll()
                     .anyRequest().authenticated()
             )
             .cors(cors -> cors.configurationSource(corsConfigurationSource()));
