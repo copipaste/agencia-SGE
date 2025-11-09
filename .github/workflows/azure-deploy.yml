@@ -1,0 +1,103 @@
+name: Deploy to Azure App Service
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  REGISTRY_NAME: agenciaacr
+  BACKEND_APP_NAME: agencia-backend-app
+  FRONTEND_APP_NAME: agencia-frontend-app
+  RESOURCE_GROUP: agencia-rg
+
+jobs:
+  build-and-deploy-backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Login to Azure Container Registry
+      run: az acr login --name ${{ env.REGISTRY_NAME }}
+    
+    - name: Build Backend Docker Image
+      run: |
+        cd agencia-backend
+        docker build -t ${{ env.REGISTRY_NAME }}.azurecr.io/agencia-backend:${{ github.sha }} .
+        docker tag ${{ env.REGISTRY_NAME }}.azurecr.io/agencia-backend:${{ github.sha }} ${{ env.REGISTRY_NAME }}.azurecr.io/agencia-backend:latest
+    
+    - name: Push Backend Image to ACR
+      run: |
+        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/agencia-backend:${{ github.sha }}
+        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/agencia-backend:latest
+    
+    - name: Deploy Backend to Azure App Service
+      run: |
+        az webapp config container set \
+          --name ${{ env.BACKEND_APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --docker-custom-image-name ${{ env.REGISTRY_NAME }}.azurecr.io/agencia-backend:${{ github.sha }}
+        
+        az webapp restart --name ${{ env.BACKEND_APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }}
+    
+    - name: Wait for Backend to be ready
+      run: |
+        echo "Waiting for backend to start..."
+        sleep 30
+        curl -f https://${{ env.BACKEND_APP_NAME }}.azurewebsites.net/actuator/health || echo "Backend health check failed"
+
+  build-and-deploy-frontend:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy-backend
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Login to Azure Container Registry
+      run: az acr login --name ${{ env.REGISTRY_NAME }}
+    
+    - name: Build Frontend Docker Image
+      run: |
+        cd agencia-frontend
+        docker build -t ${{ env.REGISTRY_NAME }}.azurecr.io/agencia-frontend:${{ github.sha }} .
+        docker tag ${{ env.REGISTRY_NAME }}.azurecr.io/agencia-frontend:${{ github.sha }} ${{ env.REGISTRY_NAME }}.azurecr.io/agencia-frontend:latest
+    
+    - name: Push Frontend Image to ACR
+      run: |
+        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/agencia-frontend:${{ github.sha }}
+        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/agencia-frontend:latest
+    
+    - name: Deploy Frontend to Azure App Service
+      run: |
+        az webapp config container set \
+          --name ${{ env.FRONTEND_APP_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --docker-custom-image-name ${{ env.REGISTRY_NAME }}.azurecr.io/agencia-frontend:${{ github.sha }}
+        
+        az webapp restart --name ${{ env.FRONTEND_APP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }}
+    
+    - name: Wait for Frontend to be ready
+      run: |
+        echo "Waiting for frontend to start..."
+        sleep 20
+        curl -f https://${{ env.FRONTEND_APP_NAME }}.azurewebsites.net/health || echo "Frontend health check failed"
+    
+    - name: Deployment Summary
+      run: |
+        echo "🚀 Deployment completed successfully!"
+        echo "📱 Frontend: https://${{ env.FRONTEND_APP_NAME }}.azurewebsites.net"
+        echo "🔧 Backend: https://${{ env.BACKEND_APP_NAME }}.azurewebsites.net"
+        echo "📊 GraphQL: https://${{ env.BACKEND_APP_NAME }}.azurewebsites.net/graphql"

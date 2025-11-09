@@ -2,13 +2,12 @@ package com.agencia.agencia_backend.service;
 
 import com.agencia.agencia_backend.dto.ReporteVentasDTO;
 import com.agencia.agencia_backend.model.Venta;
-import com.agencia.agencia_backend.model.Usuario;
+
 import com.agencia.agencia_backend.repository.VentaRepository;
 import com.agencia.agencia_backend.repository.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;

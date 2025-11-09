@@ -4,7 +4,7 @@ import { InMemoryCache, ApolloLink } from '@apollo/client/core';
 import { setContext } from '@apollo/client/link/context';
 import { HttpHeaders } from '@angular/common/http';
 
-const uri = 'http://localhost:8080/graphql';
+const uri = 'https://agencia-backend-app.azurewebsites.net/graphql';
 
 export function apolloOptionsFactory() {
   const httpLink = inject(HttpLink);
