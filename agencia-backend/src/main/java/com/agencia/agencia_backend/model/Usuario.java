@@ -39,6 +39,9 @@ public class Usuario {
     @Pattern(regexp = "M|F", message = "El sexo debe ser 'M' o 'F'")
     private String sexo;
     
+    // Token FCM para notificaciones push (nullable para no afectar registros existentes)
+    private String fcmToken;
+
     private Boolean isAdmin = false;
     private Boolean isAgente = false;
     private Boolean isCliente = false;

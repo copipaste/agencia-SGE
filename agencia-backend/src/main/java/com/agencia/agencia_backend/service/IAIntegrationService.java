@@ -83,8 +83,29 @@ public class IAIntegrationService {
         try {
             com.agencia.agencia_backend.dto.rest.PredictRequestFullDTO request =
                 featureCalculator.calcularFeaturesCompletas(venta, clienteId);
+
+            // Log detallado para diagnóstico
+            log.info("🤖 Enviando predicción COMPLETA a FastAPI:");
+            log.info("  - ventaId: {}", request.getVentaId());
+            log.info("  - clienteId: {}", request.getClienteId());
+            log.info("  - emailCliente: {}", request.getEmailCliente());
+            log.info("  - nombreCliente: {}", request.getNombreCliente());
+            log.info("  - nombrePaquete: {}", request.getNombrePaquete());
+            log.info("  - destino: {}", request.getDestino());
+            log.info("  - fechaVenta: {}", request.getFechaVenta());
+            log.info("  - montoTotal: {}", request.getMontoTotal());
+            log.info("  - Features ML: es_temporada_alta={}, metodo_pago_tarjeta={}, tiene_paquete={}",
+                request.getEsTemporadaAlta(), request.getMetodoPagoTarjeta(), request.getTienePaquete());
+
             String url = iaCancelacionUrl + "/predict";
-            return restTemplate.postForObject(url, request, PredictResponseDTO.class);
+            PredictResponseDTO response = restTemplate.postForObject(url, request, PredictResponseDTO.class);
+
+            if (response != null) {
+                log.info("✅ Respuesta recibida - Probabilidad: {}%",
+                    Math.round(response.getProbabilidadCancelacion() * 100));
+            }
+
+            return response;
         } catch (Exception e) {
             log.warn("No se pudo predecir cancelación (no crítico): {}", e.getMessage());
             return null;
