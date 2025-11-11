@@ -83,7 +83,8 @@ class BiServiceClientTest {
         System.out.println("\n🧪 Test: Dashboard Resumen");
         
         try {
-            DashboardResumenResponse resumen = biServiceClient.getDashboardResumen();
+            // Llamar sin filtros de fecha (null, null) para obtener todos los datos
+            DashboardResumenResponse resumen = biServiceClient.getDashboardResumen(null, null);
             
             assertNotNull(resumen, "La respuesta no debe ser null");
             assertNotNull(resumen.getKpis(), "Los KPIs no deben ser null");
