@@ -55,6 +55,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers("/graphiql/**").permitAll()
                     .requestMatchers("/graphql").permitAll()
+                    .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/api/reportes/**").permitAll()
                     .requestMatchers("/api/bi/**").permitAll() // Permitir TODOS los endpoints BI
                     .anyRequest().authenticated()

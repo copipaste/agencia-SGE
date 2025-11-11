@@ -29,4 +29,9 @@ public class RegisterRequest {
     
     @Pattern(regexp = "M|F", message = "El sexo debe ser 'M' o 'F'")
     private String sexo;
+
+    // Campos adicionales para perfil de Cliente (opcionales desde REST API)
+    private String direccion;
+    private String fechaNacimiento; // Formato ISO: "YYYY-MM-DD"
+    private String numeroPasaporte;
 }

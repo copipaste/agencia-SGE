@@ -11,7 +11,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
  */
 @Configuration
 public class RestTemplateConfig {
-    
+
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder, BiServiceConfig biConfig) {
         return builder

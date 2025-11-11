@@ -21,6 +21,8 @@ public class Venta {
     
     private String agenteId; // Referencia a Agente
     
+    private String paqueteId; // Referencia a PaqueteTuristico
+
     private LocalDateTime fechaVenta;
     
     private Double montoTotal;

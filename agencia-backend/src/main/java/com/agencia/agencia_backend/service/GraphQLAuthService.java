@@ -72,12 +72,32 @@ public class GraphQLAuthService {
         
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
         
-        // Crear el perfil de cliente básico (sin datos completos)
-        // El cliente deberá completar su perfil posteriormente usando updateCliente
+        // Crear el perfil de cliente
+        // Si vienen datos desde REST API (Flutter), usar esos valores
+        // Si no, usar valores por defecto "Por completar"
         Cliente cliente = new Cliente();
         cliente.setUsuarioId(usuarioGuardado.getId());
-        cliente.setDireccion("Por completar");
-        cliente.setNumeroPasaporte("Por completar");
+        cliente.setDireccion(
+            registerRequest.getDireccion() != null && !registerRequest.getDireccion().isEmpty()
+            ? registerRequest.getDireccion()
+            : "Por completar"
+        );
+        cliente.setNumeroPasaporte(
+            registerRequest.getNumeroPasaporte() != null && !registerRequest.getNumeroPasaporte().isEmpty()
+            ? registerRequest.getNumeroPasaporte()
+            : "Por completar"
+        );
+
+        // Parsear fecha de nacimiento si se proporciona
+        if (registerRequest.getFechaNacimiento() != null && !registerRequest.getFechaNacimiento().isEmpty()) {
+            try {
+                cliente.setFechaNacimiento(java.time.LocalDate.parse(registerRequest.getFechaNacimiento()));
+            } catch (Exception e) {
+                // Si el formato es inválido, dejar null
+                cliente.setFechaNacimiento(null);
+            }
+        }
+
         clienteRepository.save(cliente);
         
         // Autenticar automáticamente
