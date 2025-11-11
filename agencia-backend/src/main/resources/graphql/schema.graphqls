@@ -1,5 +1,6 @@
 # Schema principal de GraphQL para Agencia de Viajes
 
+
 # ============================================
 # QUERIES (Consultas)
 # ============================================
@@ -49,6 +50,10 @@ type Query {
     # Buscar proveedores por nombre de empresa
     searchProveedores(searchTerm: String!): [Proveedor!]!
     
+    # ========== INTELIGENCIA ARTIFICIAL ==========
+    # Obtener estadísticas de recordatorios de cancelación
+    estadisticasRecordatorios: String!
+
     # ========== SERVICIOS ==========
     # Obtener todos los servicios
     getAllServicios: [Servicio!]!
@@ -182,6 +187,10 @@ type Mutation {
     
     # Notificar venta via webhook
     notificarVenta(ventaId: ID!): NotificacionResponse!
+
+    # ========== INTELIGENCIA ARTIFICIAL ==========
+    # Forzar envío de recordatorios de cancelación (manual)
+    forzarEnvioRecordatorios: String!
 }
 
 # ============================================

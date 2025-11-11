@@ -8,9 +8,53 @@
         filename="ventas"
         printTitle="Listado de Ventas"
       ></app-export-buttons>
+      <button 
+        class="btn-ia" 
+        (click)="enviarRecordatoriosIA()"
+        [disabled]="enviandoRecordatorios"
+        title="Enviar recordatorios inteligentes de cancelación">
+        <span class="icon">🤖</span>
+        <span *ngIf="!enviandoRecordatorios">Recordatorios IA</span>
+        <span *ngIf="enviandoRecordatorios">Enviando...</span>
+      </button>
       <button class="btn-primary" (click)="nuevaVenta()">
         <span class="icon">➕</span>
         Nueva Venta
+      </button>
+    </div>
+  </div>
+
+  <!-- Panel de Estadísticas IA (colapsable) -->
+  <div class="ia-stats-section" *ngIf="estadisticasIA">
+    <button class="ia-stats-toggle" (click)="toggleEstadisticasIA()">
+      <span class="toggle-icon">{{ mostrarEstadisticasIA ? '▼' : '▶' }}</span>
+      <span class="toggle-text">📊 Estadísticas de IA - Predicciones de Cancelación</span>
+    </button>
+    
+    <div class="ia-stats-panel" *ngIf="mostrarEstadisticasIA">
+      <div class="ia-stat-card">
+        <div class="ia-stat-icon">🎯</div>
+        <div class="ia-stat-content">
+          <div class="ia-stat-label">Total Predicciones</div>
+          <div class="ia-stat-value">{{ estadisticasIA.total_predicciones || 0 }}</div>
+        </div>
+      </div>
+      <div class="ia-stat-card">
+        <div class="ia-stat-icon">⏳</div>
+        <div class="ia-stat-content">
+          <div class="ia-stat-label">Recordatorios Pendientes</div>
+          <div class="ia-stat-value">{{ estadisticasIA.recordatorios_pendientes || 0 }}</div>
+        </div>
+      </div>
+      <div class="ia-stat-card">
+        <div class="ia-stat-icon">✉️</div>
+        <div class="ia-stat-content">
+          <div class="ia-stat-label">Recordatorios Enviados</div>
+          <div class="ia-stat-value">{{ estadisticasIA.recordatorios_enviados || 0 }}</div>
+        </div>
+      </div>
+      <button class="ia-refresh-btn" (click)="cargarEstadisticasIA()" title="Actualizar estadísticas">
+        🔄 Actualizar
       </button>
     </div>
   </div>

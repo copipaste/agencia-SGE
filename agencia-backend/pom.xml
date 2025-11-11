@@ -103,6 +103,13 @@
 			<version>7.2.5</version>
 			<type>pom</type>
 		</dependency>
+
+		<!-- Firebase Admin SDK para notificaciones push -->
+		<dependency>
+			<groupId>com.google.firebase</groupId>
+			<artifactId>firebase-admin</artifactId>
+			<version>9.2.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

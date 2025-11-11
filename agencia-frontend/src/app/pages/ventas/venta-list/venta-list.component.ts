@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { VentaService } from '../../../services/venta.service';
+import { IAService } from '../../../services/ia.service';
 import { Venta } from '../../../models/venta.model';
 import { FilterPanelComponent, FilterOption, FilterValue } from '../../../components/filter-panel/filter-panel.component';
 import { ExportButtonsComponent } from '../../../components/export-buttons/export-buttons.component';
@@ -47,8 +48,14 @@ export class VentaListComponent implements OnInit {
   Math = Math; // Para usar Math.min en el template
   Object = Object; // Para usar Object.keys en el template
 
+  // Recordatorios IA
+  enviandoRecordatorios = false;
+  estadisticasIA: any = null;
+  mostrarEstadisticasIA = false;
+
   constructor(
     private ventaService: VentaService,
+    private iaService: IAService,
     private router: Router
   ) { }
 
@@ -56,6 +63,7 @@ export class VentaListComponent implements OnInit {
     this.initializeFilters();
     this.initializeExportColumns();
     this.loadVentas();
+    this.cargarEstadisticasIA();
   }
 
   initializeExportColumns(): void {
@@ -401,5 +409,98 @@ export class VentaListComponent implements OnInit {
       case 'Cancelada': return 'badge-danger';
       default: return 'badge-secondary';
     }
+  }
+
+  /**
+   * Carga las estadísticas de recordatorios del microservicio IA
+   */
+  cargarEstadisticasIA(): void {
+    this.iaService.obtenerEstadisticasRecordatorios().subscribe({
+      next: (data) => {
+        this.estadisticasIA = data;
+      },
+      error: (error) => {
+        console.warn('No se pudieron cargar estadísticas de IA:', error);
+        this.estadisticasIA = null;
+      }
+    });
+  }
+
+  /**
+   * Alterna la visibilidad del panel de estadísticas de IA
+   */
+  toggleEstadisticasIA(): void {
+    this.mostrarEstadisticasIA = !this.mostrarEstadisticasIA;
+    if (this.mostrarEstadisticasIA && !this.estadisticasIA) {
+      this.cargarEstadisticasIA();
+    }
+  }
+
+  /**
+   * Fuerza el envío inmediato de recordatorios de cancelación
+   * a través del microservicio de IA
+   */
+  enviarRecordatoriosIA(): void {
+    if (this.enviandoRecordatorios) return;
+
+    const confirmMessage = '🤖 ENVÍO DE RECORDATORIOS INTELIGENTES\n\n' +
+      '¿Desea enviar recordatorios de cancelación ahora?\n\n' +
+      'El sistema IA enviará correos a los clientes con alta probabilidad de cancelar.\n\n' +
+      '⚠️ Solo los agentes pueden ejecutar esta acción.';
+
+    if (!confirm(confirmMessage)) return;
+
+    this.enviandoRecordatorios = true;
+
+    this.iaService.forzarEnvioRecordatorios().subscribe({
+      next: (resultado) => {
+        this.enviandoRecordatorios = false;
+
+        if (resultado.success) {
+          const enviados = resultado.detalles?.recordatorios_enviados || 0;
+          const detalles = resultado.detalles?.detalles || [];
+          
+          let mensaje = `✅ RECORDATORIOS ENVIADOS EXITOSAMENTE\n\n`;
+          mensaje += `📧 Total enviados: ${enviados}\n\n`;
+          
+          if (detalles.length > 0) {
+            mensaje += '📋 Detalles:\n';
+            detalles.forEach((detalle: any, index: number) => {
+              mensaje += `\n${index + 1}. ${detalle.nombre}`;
+              mensaje += `\n   Email: ${detalle.email}`;
+              mensaje += `\n   Paquete: ${detalle.paquete}`;
+              mensaje += `\n   Probabilidad: ${(detalle.probabilidad * 100).toFixed(1)}%`;
+            });
+          }
+          
+          alert(mensaje);
+          this.cargarEstadisticasIA(); // Actualizar estadísticas
+        } else {
+          alert(`❌ ERROR AL ENVIAR RECORDATORIOS\n\n${resultado.mensaje || 'Error desconocido'}`);
+        }
+      },
+      error: (error) => {
+        console.error('Error al enviar recordatorios:', error);
+        this.enviandoRecordatorios = false;
+        
+        let errorMsg = '❌ ERROR DE CONEXIÓN\n\n';
+        
+        if (error.message?.includes('403') || error.message?.includes('Forbidden')) {
+          errorMsg += '🔒 Acceso denegado\n\n';
+          errorMsg += 'Solo los usuarios con rol AGENTE pueden enviar recordatorios.\n\n';
+          errorMsg += 'Por favor, verifica que estés autenticado con una cuenta de agente.';
+        } else if (error.message?.includes('Network') || error.message?.includes('connect')) {
+          errorMsg += 'No se pudo conectar con el servidor.\n\n';
+          errorMsg += 'Verifica que:\n';
+          errorMsg += '- Spring Boot esté corriendo en localhost:8080\n';
+          errorMsg += '- FastAPI esté corriendo en localhost:8001\n';
+          errorMsg += '- Tengas una conexión estable';
+        } else {
+          errorMsg += `Detalle: ${error.message || 'Error desconocido'}`;
+        }
+        
+        alert(errorMsg);
+      }
+    });
   }
 }

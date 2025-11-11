@@ -13,21 +13,30 @@ import com.agencia.agencia_backend.repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.mail.SimpleMailMessage;
-// import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RecordatorioService {
 
     private static final Logger log = LoggerFactory.getLogger(RecordatorioService.class);
     private static final double UMBRAL_RIESGO = 0.70; // 70%
+
+    @Value("${ia.cancelacion.url:http://localhost:8001}")
+    private String iaCancelacionUrl;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Autowired
     private AlertaCancelacionRepository alertaRepository;
@@ -41,8 +50,79 @@ public class RecordatorioService {
     @Autowired
     private PaqueteTuristicoRepository paqueteRepository;
 
-    // @Autowired(required = false)
-    // private JavaMailSender mailSender;
+    /**
+     * Fuerza el envío de recordatorios llamando al microservicio de IA
+     * Este método puede ser llamado desde un endpoint REST o GraphQL
+     *
+     * @return Mapa con resultado del envío
+     */
+    public Map<String, Object> forzarEnvioRecordatorios() {
+        try {
+            log.info("🔔 Forzando envío de recordatorios desde Angular...");
+
+            String url = iaCancelacionUrl + "/recordatorios/enviar";
+
+            // Llamar al endpoint de FastAPI
+            ResponseEntity<Map> response = restTemplate.postForEntity(url, null, Map.class);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                Map<String, Object> resultado = response.getBody();
+
+                log.info("✅ Recordatorios enviados exitosamente: {}", resultado);
+
+                return Map.of(
+                    "success", true,
+                    "mensaje", "Recordatorios enviados correctamente",
+                    "detalles", resultado
+                );
+            } else {
+                log.warn("⚠️ Respuesta no exitosa de FastAPI: {}", response.getStatusCode());
+                return Map.of(
+                    "success", false,
+                    "mensaje", "Error al enviar recordatorios",
+                    "error", "Respuesta no exitosa del microservicio"
+                );
+            }
+
+        } catch (Exception e) {
+            log.error("❌ Error al forzar envío de recordatorios: {}", e.getMessage(), e);
+            return Map.of(
+                "success", false,
+                "mensaje", "Error al conectar con el microservicio de IA",
+                "error", e.getMessage()
+            );
+        }
+    }
+
+    /**
+     * Obtiene estadísticas de recordatorios desde el microservicio
+     *
+     * @return Mapa con estadísticas
+     */
+    public Map<String, Object> obtenerEstadisticasRecordatorios() {
+        try {
+            String url = iaCancelacionUrl + "/recordatorios/estadisticas";
+
+            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                return response.getBody();
+            } else {
+                return Map.of(
+                    "success", false,
+                    "mensaje", "No se pudieron obtener estadísticas"
+                );
+            }
+
+        } catch (Exception e) {
+            log.error("❌ Error al obtener estadísticas: {}", e.getMessage());
+            return Map.of(
+                "success", false,
+                "mensaje", "Error al conectar con el microservicio",
+                "error", e.getMessage()
+            );
+        }
+    }
 
     /**
      * Registra una alerta de cancelación en PostgreSQL
