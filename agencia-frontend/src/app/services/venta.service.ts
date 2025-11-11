@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
-import { Observable, map } from 'rxjs';
+import { Observable, map, switchMap, tap, catchError, of, delay } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { Venta } from '../models/venta.model';
 import { DetalleVentaInput } from '../models/detalle-venta.model';
 
@@ -9,7 +10,12 @@ import { DetalleVentaInput } from '../models/detalle-venta.model';
 })
 export class VentaService {
 
-  constructor(private apollo: Apollo) { }
+  private readonly BI_SERVICE_URL = 'http://localhost:8080/api/bi';
+
+  constructor(
+    private apollo: Apollo,
+    private http: HttpClient
+  ) { }
 
   getAllVentas(): Observable<Venta[]> {
     return this.apollo.query<any>({
@@ -83,7 +89,31 @@ export class VentaService {
         }
       `,
       variables: { id, input }
-    }).pipe(map(result => result.data.updateVenta));
+    }).pipe(
+      map(result => result.data.updateVenta),
+      // Sincronizar con BI automáticamente después de actualizar
+      tap(venta => {
+        console.log('✅ Venta actualizada, sincronizando con BI...');
+        this.sincronizarBI().subscribe({
+          next: () => console.log('✅ Sincronización BI completada'),
+          error: (err) => console.warn('⚠️ Error al sincronizar BI (no crítico):', err)
+        });
+      })
+    );
+  }
+
+  /**
+   * Fuerza la sincronización inmediata con el servicio BI
+   * Se ejecuta automáticamente después de actualizar ventas
+   */
+  private sincronizarBI(): Observable<any> {
+    // Llamar al endpoint /sync/force a través del backend Spring Boot
+    return this.http.post(`${this.BI_SERVICE_URL}/sync/force`, {}).pipe(
+      catchError(error => {
+        console.warn('Error al sincronizar BI:', error);
+        return of(null); // No fallar si la sincronización falla
+      })
+    );
   }
 
   deleteVenta(id: string): Observable<boolean> {
