@@ -17,6 +17,8 @@ import java.util.Optional;
 @Service
 public class ClienteService {
 
+    private static final String CLIENTE_NOT_FOUND_MSG = "Cliente no encontrado con ID: ";
+
     @Autowired
     private ClienteRepository clienteRepository;
 
@@ -117,7 +119,7 @@ public class ClienteService {
      */
     public Cliente updateCliente(String id, UpdateClienteInput input) {
         Cliente cliente = clienteRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + id));
+            .orElseThrow(() -> new RuntimeException(CLIENTE_NOT_FOUND_MSG + id));
 
         // Actualizar solo los campos que no son null
         if (input.getDireccion() != null) {
@@ -143,16 +145,26 @@ public class ClienteService {
      */
     public boolean deleteCliente(String id) {
         Cliente cliente = clienteRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + id));
+            .orElseThrow(() -> new RuntimeException(CLIENTE_NOT_FOUND_MSG + id));
 
         clienteRepository.delete(cliente);
         return true;
     }
 
     /**
-     * Activar/Desactivar cliente (no aplica en la nueva estructura)
+     * Activar/Desactivar cliente
      */
     public Cliente toggleClienteStatus(String id) {
-        throw new RuntimeException("La función toggleClienteStatus no está disponible en la estructura actual");
+        Cliente cliente = clienteRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException(CLIENTE_NOT_FOUND_MSG + id));
+
+        // Get associated user and toggle isActive
+        Usuario usuario = usuarioRepository.findById(cliente.getUsuarioId())
+            .orElseThrow(() -> new RuntimeException("Usuario asociado no encontrado"));
+
+        usuario.setIsActive(!usuario.getIsActive());
+        usuarioRepository.save(usuario);
+
+        return cliente;
     }
 }
