@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.angular/
+*.log
+.DS_Store
+.idea/
+*.iml
+.vscode/
+.git/
+*.md
+coverage/
+.nyc_output/

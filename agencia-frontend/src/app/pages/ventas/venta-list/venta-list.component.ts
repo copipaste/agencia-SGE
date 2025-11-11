@@ -342,6 +342,42 @@ export class VentaListComponent implements OnInit {
     this.ventaToDelete = null;
   }
 
+  notificarVenta(ventaId?: string): void {
+    if (!ventaId) return;
+
+    // Buscar la venta para validación
+    const venta = this.ventas.find(v => v.id === ventaId);
+    if (!venta) return;
+
+    // No permitir notificación de ventas canceladas
+    if (venta.estadoVenta === 'Cancelada') {
+      alert('No se pueden enviar notificaciones de ventas canceladas');
+      return;
+    }
+
+    // Confirmación antes de enviar
+    if (!confirm(`¿Desea enviar la notificación de esta venta al cliente ${this.getClienteNombre(venta)}?`)) {
+      return;
+    }
+
+    this.loading = true;
+    this.ventaService.notificarVenta(ventaId).subscribe({
+      next: (response) => {
+        this.loading = false;
+        if (response.success) {
+          alert(`✅ ${response.message}`);
+        } else {
+          alert(`❌ ${response.message}`);
+        }
+      },
+      error: (error) => {
+        this.loading = false;
+        console.error('Error al enviar notificación:', error);
+        alert('❌ Error al enviar la notificación. Por favor, intente nuevamente.');
+      }
+    });
+  }
+
   nuevaVenta(): void {
     this.router.navigate(['/dashboard/ventas/nuevo']);
   }

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { DashboardBiComponent } from './pages/dashboard-bi/dashboard-bi.component';
 import { ClienteListComponent } from './pages/clientes/cliente-list/cliente-list.component';
 import { ClienteFormComponent } from './pages/clientes/cliente-form/cliente-form.component';
 import { ClienteShowComponent } from './pages/clientes/cliente-show/cliente-show.component';
@@ -54,7 +55,8 @@ export const routes: Routes = [
       { path: 'ventas', component: VentaListComponent },
       { path: 'ventas/nuevo', component: VentaFormComponent },
       { path: 'ventas/ver/:id', component: VentaShowComponent },
-      { path: 'ventas/editar/:id', component: VentaFormComponent }
+      { path: 'ventas/editar/:id', component: VentaFormComponent },
+      { path: 'business-intelligence', component: DashboardBiComponent }
     ]
   },
   { path: '**', redirectTo: '/login' }
