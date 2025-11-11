@@ -89,7 +89,7 @@ export interface KpiResponse {
   providedIn: 'root'
 })
 export class BiService {
-  private readonly API_URL = 'http://localhost:8080/api/bi';
+  private readonly API_URL = 'https://agencia-backend-app.azurewebsites.net/api/bi';
 
   constructor(private http: HttpClient) {}
 
