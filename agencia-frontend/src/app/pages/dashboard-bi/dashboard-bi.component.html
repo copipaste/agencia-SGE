@@ -1,0 +1,311 @@
+<div class="dashboard-bi-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>📊 Dashboard de Business Intelligence</h1>
+      <div class="header-actions">
+        <!-- Estado de salud -->
+        <div class="health-indicator" [ngClass]="{
+          'healthy': healthStatus === 'healthy',
+          'unhealthy': healthStatus === 'unhealthy',
+          'checking': healthStatus === 'checking'
+        }">
+          <span class="status-dot"></span>
+          <span class="status-text">
+            {{ healthStatus === 'healthy' ? 'Conectado' : 
+               healthStatus === 'unhealthy' ? 'Desconectado' : 
+               'Verificando...' }}
+          </span>
+        </div>
+
+        <!-- Botón exportar CSV -->
+        <button class="btn-export" (click)="exportarCSV()" [disabled]="loading">
+          <span class="icon">📥</span>
+          Exportar CSV
+        </button>
+
+        <!-- Botón refrescar -->
+        <button class="btn-refresh" (click)="refresh()" [disabled]="loading">
+          <span class="icon">🔄</span>
+          Actualizar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando datos de Business Intelligence...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-icon">⚠️</div>
+    <h3>Error al cargar datos</h3>
+    <p>{{ error }}</p>
+    <button class="btn-retry" (click)="refresh()">Intentar de nuevo</button>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading && !error && dashboardData" class="dashboard-content">
+    
+    <!-- Sync Status Card (si está disponible) -->
+    <div *ngIf="syncStatus" class="sync-status-card">
+      <div class="card-header">
+        <h3>⚡ Estado de Sincronización</h3>
+      </div>
+      <div class="card-body">
+        <div class="sync-info">
+          <div class="sync-item">
+            <span class="label">Estado:</span>
+            <span class="value" [ngClass]="{'active': syncStatus.sync_enabled}">
+              {{ syncStatus.sync_enabled ? 'Habilitado' : 'Deshabilitado' }}
+            </span>
+          </div>
+          <div class="sync-item">
+            <span class="label">Sincronización:</span>
+            <span class="value" [ngClass]="{'active': syncStatus.sync_running}">
+              {{ syncStatus.sync_running ? 'En ejecución' : 'Detenido' }}
+            </span>
+          </div>
+          <div class="sync-item">
+            <span class="label">Mensaje:</span>
+            <span class="value">{{ syncStatus.message }}</span>
+          </div>
+        </div>
+        <!-- <button class="btn-restart" (click)="restartSync()">
+          Reiniciar Sincronización
+        </button> -->
+      </div>
+    </div>
+
+    <!-- Filtros de Fecha -->
+    <div class="filters-panel">
+      <div class="filters-header">
+        <h3>📅 Filtros de Período</h3>
+        <button class="btn-clear-filters" (click)="limpiarFiltros()" *ngIf="periodoActivo !== 'todo'">
+          ✖ Limpiar
+        </button>
+      </div>
+      
+      <div class="filters-content">
+        <!-- Botones de períodos predefinidos -->
+        <div class="period-buttons">
+          <button 
+            class="btn-period" 
+            [class.active]="periodoActivo === 'todo'"
+            (click)="setPeriodo('todo')">
+            Todo
+          </button>
+          <button 
+            class="btn-period" 
+            [class.active]="periodoActivo === 'hoy'"
+            (click)="setPeriodo('hoy')">
+            Hoy
+          </button>
+          <button 
+            class="btn-period" 
+            [class.active]="periodoActivo === 'semana'"
+            (click)="setPeriodo('semana')">
+            Esta Semana
+          </button>
+          <button 
+            class="btn-period" 
+            [class.active]="periodoActivo === 'mes'"
+            (click)="setPeriodo('mes')">
+            Este Mes
+          </button>
+          <button 
+            class="btn-period" 
+            [class.active]="periodoActivo === 'año'"
+            (click)="setPeriodo('año')">
+            Este Año
+          </button>
+        </div>
+
+        <!-- Fechas personalizadas -->
+        <div class="custom-dates">
+          <div class="date-input-group">
+            <label for="fecha-inicio">Desde:</label>
+            <input 
+              type="date" 
+              id="fecha-inicio"
+              [(ngModel)]="fechaInicio"
+              (ngModelChange)="onFechaChange()"
+              class="date-input">
+          </div>
+          <div class="date-input-group">
+            <label for="fecha-fin">Hasta:</label>
+            <input 
+              type="date" 
+              id="fecha-fin"
+              [(ngModel)]="fechaFin"
+              (ngModelChange)="onFechaChange()"
+              class="date-input">
+          </div>
+          <button 
+            class="btn-apply-filters" 
+            (click)="aplicarFiltros()"
+            [disabled]="!fechaInicio && !fechaFin">
+            Aplicar
+          </button>
+        </div>
+
+        <!-- Período activo (mostrar si hay filtros) -->
+        <div class="active-period" *ngIf="dashboardData.periodo.inicio || dashboardData.periodo.fin">
+          <span class="period-label">Período activo:</span>
+          <span class="period-value">
+            {{ dashboardData.periodo.inicio ? formatDate(dashboardData.periodo.inicio) : 'Inicio' }} 
+            - 
+            {{ dashboardData.periodo.fin ? formatDate(dashboardData.periodo.fin) : 'Fin' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPIs Grid -->
+    <div class="kpis-grid">
+      <!-- Total Clientes -->
+      <div class="kpi-card">
+        <div class="kpi-icon">👥</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Total Clientes</div>
+          <div class="kpi-value">{{ dashboardData.kpis.total_clientes }}</div>
+        </div>
+      </div>
+
+      <!-- Ventas Confirmadas -->
+      <div class="kpi-card success">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Ventas Confirmadas</div>
+          <div class="kpi-value">{{ dashboardData.kpis.total_ventas_confirmadas }}</div>
+        </div>
+      </div>
+
+      <!-- Ventas Pendientes -->
+      <div class="kpi-card warning">
+        <div class="kpi-icon">⏳</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Ventas Pendientes</div>
+          <div class="kpi-value">{{ dashboardData.kpis.total_ventas_pendientes }}</div>
+        </div>
+      </div>
+
+      <!-- Ventas Canceladas -->
+      <div class="kpi-card danger">
+        <div class="kpi-icon">❌</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Ventas Canceladas</div>
+          <div class="kpi-value">{{ dashboardData.kpis.total_ventas_canceladas }}</div>
+        </div>
+      </div>
+
+      <!-- Total Ventas -->
+      <div class="kpi-card">
+        <div class="kpi-icon">📊</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Total Ventas</div>
+          <div class="kpi-value">{{ dashboardData.kpis.total_ventas }}</div>
+        </div>
+      </div>
+
+      <!-- Monto Total Vendido -->
+      <div class="kpi-card highlight">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Monto Vendido (Confirmado)</div>
+          <div class="kpi-value">{{ formatCurrency(dashboardData.kpis.total_monto_vendido) }}</div>
+        </div>
+      </div>
+
+      <!-- Monto Pendiente -->
+      <div class="kpi-card warning">
+        <div class="kpi-icon">💸</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Monto Pendiente</div>
+          <div class="kpi-value">{{ formatCurrency(dashboardData.kpis.total_monto_pendiente) }}</div>
+        </div>
+      </div>
+
+      <!-- Tasa de Cancelación -->
+      <div class="kpi-card" [ngClass]="{'danger': dashboardData.kpis.tasa_cancelacion > 20}">
+        <div class="kpi-icon">📉</div>
+        <div class="kpi-content">
+          <div class="kpi-label">Tasa de Cancelación</div>
+          <div class="kpi-value">{{ formatPercentage(dashboardData.kpis.tasa_cancelacion) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Destinos -->
+    <div class="top-destinos-card">
+      <div class="card-header">
+        <h3>🌍 Top Destinos por Ingresos</h3>
+      </div>
+      <div class="card-body">
+        <div class="destinos-list">
+          <div 
+            *ngFor="let destino of dashboardData.top_destinos; let i = index" 
+            class="destino-item"
+            [ngClass]="{'top-1': i === 0, 'top-2': i === 1, 'top-3': i === 2}"
+          >
+            <div class="destino-rank">{{ i + 1 }}</div>
+            <div class="destino-info">
+              <div class="destino-nombre">{{ destino.destino }}</div>
+              <div class="destino-ingresos">{{ formatCurrency(destino.ingresos) }}</div>
+            </div>
+            <div class="destino-bar">
+              <div 
+                class="bar-fill" 
+                [style.width.%]="(destino.ingresos / dashboardData!.top_destinos[0].ingresos) * 100"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tendencia de Reservas -->
+    <div class="tendencia-card">
+      <div class="card-header">
+        <h3>📅 Tendencia de Reservas por Día</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart-container">
+          <div class="chart-simple">
+            <div 
+              *ngFor="let item of dashboardData.tendencia_reservas_por_dia" 
+              class="chart-bar"
+              [style.height.px]="item.cantidad_reservas * 40"
+            >
+              <div class="bar-tooltip">
+                <div class="tooltip-value">{{ item.cantidad_reservas }} reservas</div>
+                <div class="tooltip-date">{{ formatDate(item.fecha) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="chart-labels">
+            <div 
+              *ngFor="let item of dashboardData.tendencia_reservas_por_dia" 
+              class="chart-label"
+            >
+              {{ formatDate(item.fecha).split(' ')[0] }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del Período -->
+    <div *ngIf="dashboardData.periodo.inicio || dashboardData.periodo.fin" class="periodo-info">
+      <span class="periodo-label">Período de análisis:</span>
+      <span class="periodo-value">
+        {{ dashboardData.periodo.inicio ? formatDate(dashboardData.periodo.inicio) : 'Inicio' }}
+        -
+        {{ dashboardData.periodo.fin ? formatDate(dashboardData.periodo.fin) : 'Actual' }}
+      </span>
+    </div>
+  </div>
+</div>

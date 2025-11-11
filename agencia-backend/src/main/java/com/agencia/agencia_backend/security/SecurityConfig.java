@@ -56,6 +56,7 @@ public class SecurityConfig {
                 auth.requestMatchers("/graphiql/**").permitAll()
                     .requestMatchers("/graphql").permitAll()
                     .requestMatchers("/api/reportes/**").permitAll()
+                    .requestMatchers("/api/bi/**").permitAll() // Permitir TODOS los endpoints BI
                     .anyRequest().authenticated()
             )
             .cors(cors -> cors.configurationSource(corsConfigurationSource()));

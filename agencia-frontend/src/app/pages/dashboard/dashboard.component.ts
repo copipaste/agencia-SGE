@@ -19,10 +19,11 @@ export class DashboardComponent implements OnInit {
 
   menuItems = [
     { icon: '📊', label: 'Dashboard', route: '/dashboard', active: true },
+    { icon: '💎', label: 'Business Intelligence', route: '/dashboard/business-intelligence', active: false },
     { icon: '👥', label: 'Clientes', route: '/dashboard/clientes', active: false },
     { icon: '🏢', label: 'Proveedores', route: '/dashboard/proveedores', active: false },
     { icon: '🏨', label: 'Servicios', route: '/dashboard/servicios', active: false },
-    { icon: '�', label: 'Paquetes Turísticos', route: '/dashboard/paquetes-turisticos', active: false },
+    { icon: '✈️', label: 'Paquetes Turísticos', route: '/dashboard/paquetes-turisticos', active: false },
     { icon: '💰', label: 'Ventas', route: '/dashboard/ventas', active: false },
     { icon: '👤', label: 'Agentes', route: '/dashboard/agentes', active: false },
     { icon: '⚙️', label: 'Configuración', route: '/dashboard/configuracion', active: false }
